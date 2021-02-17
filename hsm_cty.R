@@ -2,6 +2,7 @@
 # Last updated Feb 17 2021
 rm(list=ls()) # clear workspace i.e. remove saved variables
 cat("\014") # clear console
+setwd("~/Yale Courses/Research/Final Paper/HSM_github/")
 library(tidyr)
 library(reshape2)
 source('demrate_fn.R')
@@ -34,7 +35,7 @@ create_sm_df<- function (county,summary,projection,scenNum) { # function to crea
   # Add columns for vacancy-rate adjusted occupied stock growth, a first estimate for total stock growth.
   stockModel$VOSG_MH<-stockModel$VOSG_MF<-stockModel$VOSG_SF<-0 
   # Add columns for occupied and total stock growth, H (TSG/VOSG), and change in vacancy rate by type. These parameters are used to estimate construction. Set to zero
-  # Actually only OSG is used. Can remove the columns for TSG and dVR if it doens't upset the model indexing
+  # Actually only OSG is used. TSG is in the end used to identify non-standard demolition scenarios. dVR is renamed to Vn, to keep track of the natural vacancy rates.
   stockModel[,sum_cn[210:221]]<-0
   names(stockModel)[47:49]<-c("Vn_SF","Vn_MF","Vn_MH") # rename the unused dVRs to Vns to store the natural rates
   
@@ -277,9 +278,7 @@ projection$GeoID<-ss$GEOID[i]
 
 smdf[i,3]<-nest(create_sm_df(h20pc[i,],summary_US,projection,scen),cty_smdf = everything())
 }
-# save(smdf,file="County_SMDF.RData")
 assign(paste("smdf_",scenarios[scen],sep=""),smdf)
-# save(smdf,file=paste("County_SMDF_",scenarios[scen],".RData", sep = ""))
 }
 save(smdf_Baseline,smdf_Hi_DR,smdf_Hi_MFS,smdf_Hi_DR_Hi_MFS,file = "HSM_Results/County_SMDF_Scenarios.RData")
 
@@ -291,8 +290,9 @@ smop_hiDRMF<-h20pc[,2:3]
 # now call stock model function to fill in data frame for every county
 # some low growth counties 'lgc'
 # lgc<-c(3,104,205,207,223,311,313,363,611,726,1230,1685,1885,2231,2624,2793) # Barbour AL, Maricopa, LA, Marin CA, San Diego CA, Litchfield CT, NHV, Miami-Dade, Cook IL, Hamilton IN, Franklin NE, Suffolk MA,Warren NY, Malheur OR, Harrix TX, Piute UT
-# lgc<-c(3,205)
+lgc<-c(3,205)
 for (k in 1:3142) {print(k)
+# for (k in lgc) { print(k)
   df<-as.data.frame(smdf_Baseline[[3]][[k]]) # remove annoying list properties
   smop_base[k,3]<-nest(run_sm_cty(df),cty_sm=everything())
 }
@@ -312,4 +312,4 @@ for (k in 1:3142) {print(k)
   smop_hiDRMF[k,3]<-nest(run_sm_cty(df),cty_sm=everything())
 }
 
-save(smop_base,smop_hiDR,smop_hiDRMF,smop_hiMF,file="HSM_Results/County_Scenario_SM_Results.RData")
+save(smop_base,smop_hiDR,smop_hiDRMF,smop_hiMF,file="HSM_Results/County_Scenario_SM_Resultsstock.RData")
