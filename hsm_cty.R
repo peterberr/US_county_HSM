@@ -127,13 +127,13 @@ create_sm_df<- function (county,summary,projection,scenNum) { # function to crea
 }
 
 ## load in intial housing stock data for 2020
-load("~/Yale Courses/Research/Final Paper/StockModelCode/InitStock20_new.RData") # this is created by the phc19.R script
+load("Intermediate_results/InitStock20.RData") # this is created by the pop_housing.R script
 ## load in projections of population and household size by county
-load("~/Yale Courses/Research/Final Paper/StockModelCode/CountyProjectionsnew.RData") # this is created by the phc19.R script
+load("Intermediate_results/CountyProjections.RData") # this is created by the pop_housing.R script
 ## load in linear models of construction and construction ratios
-load("~/Yale Courses/Research/Final Paper/StockModelCode/ConLinModels_new.RData") # this is created by the AHS_HSM_development_exp.R script
+load("Intermediate_results/ConLinModels.RData") # this is created by the AHS_HSM_dev.R script
 ## load in summaries of stock evolution for US and four census regions, 1985-2017
-load("~/Yale Courses/Research/Final Paper/StockModelCode/summaries_new.RData") # this is created by the AHS_HSM_development_exp.R script
+load("Intermediate_results/summaries.RData") # this is created by the AHS_HSM_dev.R script
 
 # define adjustments to vacancy rates by age group for each housing type, based on calculations in AHS_HSM_development
 dem_adj_SF<-c(0,-0.005,0,0.005) # adjustments to vacancies by 0-10, 11-30, 31-60, and 61+ age-groups. Name is misleading, should be renamed vac_adj
@@ -167,7 +167,7 @@ Vn_MF_W<-mean(summary_W$VR_MF)*0.995
 Vn_MH_W<-mean(summary_W$VR_MH)*0.995
 
 # load concordance of states to divisions and regions
-st_reg<-read.csv('~/Yale Courses/Research/Final Paper/StockModelCode/state-geocodes-v2017.csv')
+st_reg<-read.csv('Data/state-geocodes-v2017.csv')
 sr<-st_reg[,c(1,3)] # get just state and region codes
 h20pc$StateCode<-as.numeric(substr(h20pc$GeoID,1,nchar(h20pc$GeoID)-3))
 h20pc<-merge(h20pc,sr,by.x = "StateCode",by.y = "State_FIPS") # keep the state code in the df, it may be used later for particular counties, e.g. CA
