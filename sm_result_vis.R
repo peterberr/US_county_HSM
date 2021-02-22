@@ -183,8 +183,6 @@ summ_hiDRMF<-smop_hiDRMF[,-3]    # summary of stock changes, hiDRMF scenario
 # # where is demolition greatest? will pick out places which currently have larege (and old) housing stocks.
 # hiDem_hiDRMF<-summ_hiDRMF[order(-summ_hiDRMF$DemTot),][1:35,] # big cities: LA, Houston, Chicago, Phoenix, Miami, Dallas, SD, Fort Lauderdale, NY city, Fort Worth
 
-
-# df<-as.data.frame(smop_base[[3]][[1]][,c(1:31,110:169)]) # example data frame for first county. not needed?
 ## load in intial housing stock data for 2020
 load("Intermediate_results/InitStock20.RData")
 st_reg<-read.csv('Data/state-geocodes-v2017.csv')
@@ -204,14 +202,14 @@ stcd<-stcd[,1:3] # keep only state abbreviation and state name
 colnames(stcd)<-c("STATE_ID","STUSAB","STATE_NAME")
 st<-merge(st_reg,stcd,by.x = "State_FIPS",by.y = "STATE_ID")
 
-smop_base$County.StateAbb<-smop_base$County.State
+# smop_base$County.StateAbb<-smop_base$County.State
 codes$County.StateAbb<-codes$County.State
 for (j in 1:51) {
-  # smop_base$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],smop_base$County.StateAbb) # this was commented out, not sure if necessary, circle back at the end
+  # smop_base$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],smop_base$County.StateAbb) # unnecessary
   codes$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],codes$County.StateAbb)
 }
 # this following line may then also be unneccesary
-smop_hiDR$County.StateAbb<-smop_hiMF$County.StateAbb<-smop_hiDRMF$County.StateAbb<-smop_base$County.StateAbb
+# smop_hiDR$County.StateAbb<-smop_hiMF$County.StateAbb<-smop_hiDRMF$County.StateAbb<-smop_base$County.StateAbb
 
 # extract template for making US summary results, for each scenario ##########
 us_base<-as.data.frame(smop_base[[3]][[1]][,c(1:31,110:169)])
