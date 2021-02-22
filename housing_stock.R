@@ -495,7 +495,7 @@ h19tb_new[,16:42]<-round(h19tb_new[,16:42]) # get rid of decimal places
 h19tb_new$TotSumUnits<-h19tb_new$Cpre40Sum+h19tb_new$C4059Sum+h19tb_new$C6079Sum+h19tb_new$C8099Sum+h19tb_new$C2000Sum+h19tb_new$C2010Sum
 h19tb_new$CheckSum<-h19tb_new$TotSumUnits/h19tb_new$Total_HU # compare the cohort sum with the reported total sum
 # just to make sure, but should already be dealt with above
-h19tb_new[h19tb_new$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
-h19tb_new[h19tb_new$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana"
+# h19tb_new[h19tb_new$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
+# h19tb_new[h19tb_new$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana"
 save(h19tb_new,file= "Intermediate_results/TotalHousing2019.RData")
 # write.csv(h19tb_new,'TotHousStock2019new.csv')
