@@ -326,7 +326,7 @@ us_hiDRMF[,18:21]<-us_hiDRMF[,22:25]/us_hiDRMF[,14:17]
 # calculate addition (con) and loss (dem) rates
 us_hiDRMF[,c("Con_Rate_SF","Con_Rate_MF","Con_Rate_MH")]<-us_hiDRMF[,c("Con_SF","Con_MF","Con_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
 us_hiDRMF[,c("Dem_Rate_SF","Dem_Rate_MF","Dem_Rate_MH")]<-us_hiDRMF[,c("Dem_SF","Dem_MF","Dem_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
-save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="HSM_results/US_smop_scenarios.RData")
+save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="Summary_results/US_smop_scenarios.RData")
 # load("HSM_results/US_smop_scenarios.RData")
 # figure out how many occupied new constructions exist every 5 years for each scenario ##############
 new_OU_base<-us_base[c(seq(1,41,5)),c(2,38:41,58:61,78:81)] # extract columns of Year, and Tot occupied units by type and new cohort
