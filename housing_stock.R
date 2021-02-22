@@ -34,12 +34,14 @@ names(htot2019)<-n
 htot2019<-htot2019[-1,]
 names(htot2019)[1:3]<-c("GeoID","StID","County,State")
 htot2019<-htot2019[1:3142,]
+htot2019[htot2019$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
+htot2019[htot2019$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana"
 # get state abbreviation and county name
 htot2019$StID_num<-as.numeric(htot2019$StID)
 htot2019<-merge(htot2019,stcd,by.x = "StID_num",by.y = "STATE_ID")
 htot2019$County<-sub(",.*","",htot2019$`County,State`)
 # add the ResStock compatible county ID
-htot2019$RS_ID<-paste(htot2019$STUSAB,", ",htot2019$County,sep="") 
+htot2019$RS_ID<-paste(htot2019$STUSAB,", ",htot2019$County,sep="")
 ctycode<-htot2019[,c("GeoID","RS_ID")]
 htot2019[,5:25]<-as.numeric(unlist(htot2019[,5:25]))
 save(ctycode,file="Intermediate_results/ctycode.RData")
@@ -68,6 +70,8 @@ n2<-as.character(htot2019_1yr[1,])
 names(htot2019_1yr)<-n2
 htot2019_1yr<-htot2019_1yr[-1,]
 names(htot2019_1yr)[1:3]<-c("GeoID","StID","County,State")
+htot2019_1yr[htot2019_1yr$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
+htot2019_1yr[htot2019_1yr$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana" # doesn't exist in 1yr data file
 htot2019_1yr<-htot2019_1yr[htot2019_1yr$StID<57,] # remove PR counties
 htot2019_1yr[,4:24]<-as.numeric(unlist(htot2019_1yr[,4:24]))
 htot2019_1yr<-na.omit(htot2019_1yr)
@@ -128,6 +132,7 @@ h19t<-h19t[order(h19t$GeoID),] # order by GeoID
 h19t[,4:24]<-round(h19t[,4:24]) # remove decimal places
 h19t<-merge(h19t,ctycode)
 
+
 # get data for occupied housing stock from B25127 1-yr, 5-yr, and 1-yr state tables  ###############
 hocc2019<-read.csv("~/Yale Courses/Research/US Housing/ACS/B25127_2019/ACSDT5Y2019.B25127_data_with_overlays_2020-12-21T184915.csv")
 hocc2019$id<-substr(hocc2019$GEO_ID,nchar(hocc2019$GEO_ID)-4,nchar(hocc2019$GEO_ID))
@@ -155,6 +160,8 @@ names(hocc2019)<-n
 hocc2019<-hocc2019[-1,]
 names(hocc2019)[1:3]<-c("GeoID","StID","County,State")
 hocc2019<-hocc2019[1:3142,]
+hocc2019[hocc2019$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
+hocc2019[hocc2019$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana"
 hocc2019[,4:90]<-as.numeric(unlist(hocc2019[,4:90]))
 
 hocc2019_1yr<-read.csv("~/Yale Courses/Research/US Housing/ACS/B25127_2019/ACSDT1Y2019.B25127_data_with_overlays_2020-12-21T184915.csv")
@@ -179,6 +186,8 @@ n2<-as.character(hocc2019_1yr[1,])
 names(hocc2019_1yr)<-n2
 hocc2019_1yr<-hocc2019_1yr[-1,]
 names(hocc2019_1yr)[1:3]<-c("GeoID","StID","County,State")
+hocc2019_1yr[hocc2019_1yr$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
+hocc2019_1yr[hocc2019_1yr$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana" # doen'st exist in 1 year data
 # hocc2019_1yr[,3:90]<-gsub('null',NA,hocc2019_1yr[,3:90])
 for (k in 3:90) {hocc2019_1yr[,k]<-gsub('null',NA,hocc2019_1yr[,k])}
 hocc2019_1yr<-na.omit(hocc2019_1yr) # remove rows without full details, leaving only the counties fully described. this knocks out a lot of rows
@@ -485,6 +494,8 @@ h19tb_new[,16:42]<-round(h19tb_new[,16:42]) # get rid of decimal places
 # # sum, this is for later when I am finalzing the number of occupied houses. If occupied>total, occupied <- total
 h19tb_new$TotSumUnits<-h19tb_new$Cpre40Sum+h19tb_new$C4059Sum+h19tb_new$C6079Sum+h19tb_new$C8099Sum+h19tb_new$C2000Sum+h19tb_new$C2010Sum
 h19tb_new$CheckSum<-h19tb_new$TotSumUnits/h19tb_new$Total_HU # compare the cohort sum with the reported total sum
-
+# just to make sure, but should already be dealt with above
+h19tb_new[h19tb_new$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
+h19tb_new[h19tb_new$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana"
 save(h19tb_new,file= "Intermediate_results/TotalHousing2019.RData")
 # write.csv(h19tb_new,'TotHousStock2019new.csv')
