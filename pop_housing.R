@@ -5,7 +5,7 @@ cat("\014") # clear console
 # make sure plyr is not loaded
 library(dplyr)
 library(tidyr)
-
+setwd("C:/Users/pb637/Documents/Yale Courses/Research/Final Paper/HSM_github")
 load('~/Yale Courses/Research/US Housing/Popn Survey/2017 USCB Pop Projections/Hauer files/SSP_asrc/Hauer.RData') # Hauer data, based on 'SSP_asrc.csv' file, accessible at https://osf.io/uh5sj/
 
 ssp1<-tapply(d$SSP1,d$YEAR,sum) # summary populations each 5 years 2020-2010, ssp1
@@ -88,6 +88,8 @@ pocc2019[pocc2019$GeoID=="35013",]$`County,State`<-"Dona Ana County, New Mexico"
 p19<-merge(pres1019,pocc2019,by.x = "County.State",by.y="County,State")
 p19<-p19[,c(14,1,15,13,16:22)] # extract only GeoID, County.State, StateID, Resident pop in 2019, then hh population total, by type and percentages
 p19<-p19[order(p19$GeoID),] # order by GeoID
+# adjust spelling of La Salle, LA
+p19[p19$GeoID==22059,]$County.State<-"La Salle Parish, Louisiana"
 # check population ratios to see if there are any unusual differences, or to see if the matching by county name failed
 # generally we should see that the census residential population is larger than the household population
 p19$popr<-p19$X2019/p19$HhPop
