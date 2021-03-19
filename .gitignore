@@ -2,3 +2,8 @@
 HSM_results/*
 # HSM Figure (not necessary for sharing, can be recreated by running sm_results_vis.R)
 Figures/*
+# Data from ResStock
+Resstock_outputs/*
+# Rhistory files
+/*.Rhistory
+.Rhistory

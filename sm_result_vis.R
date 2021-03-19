@@ -27,7 +27,18 @@ for (r in 1:3142) {
   smop_base$VFGrowthAbs[r]<-smop_base[[3]][[r]]$Vacancy_Ratio[41]-smop_base[[3]][[r]]$Vacancy_Ratio[1]
   smop_base$MFGrowthAbs[r]<-smop_base[[3]][[r]]$Tot_HU_MF[41]-smop_base[[3]][[r]]$Tot_HU_MF[1]
   smop_base$DemTot[r]<-sum(smop_base[[3]][[r]][,26:28])
+  smop_base$pc_pre60[r]<-(smop_base[[3]][[r]]$Tot_HU_SF[1]*(smop_base[[3]][[r]]$pcTot_HU_SF_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_SF_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_SF_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_SF_Vac_1940_59[1])+
+                         smop_base[[3]][[r]]$Tot_HU_MF[1]*(smop_base[[3]][[r]]$pcTot_HU_MF_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MF_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MF_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_MF_Vac_1940_59[1])+
+                         smop_base[[3]][[r]]$Tot_HU_MH[1]*(smop_base[[3]][[r]]$pcTot_HU_MH_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Vac_1940_59[1]))/smop_base[[3]][[r]]$Tot_Hous_Units[1]
+  smop_base$abs_pre60[r]<-smop_base[[3]][[r]]$Tot_HU_SF[1]*(smop_base[[3]][[r]]$pcTot_HU_SF_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_SF_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_SF_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_SF_Vac_1940_59[1])+
+                             smop_base[[3]][[r]]$Tot_HU_MF[1]*(smop_base[[3]][[r]]$pcTot_HU_MF_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MF_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MF_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_MF_Vac_1940_59[1])+
+                             smop_base[[3]][[r]]$Tot_HU_MH[1]*(smop_base[[3]][[r]]$pcTot_HU_MH_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Vac_1940_59[1])
+  smop_base$tot_HU[r]<-smop_base[[3]][[r]]$Tot_Hous_Units[1]
 }
+# (sb$Tot_HU_SF[1]*(sb$pcTot_HU_SF_Occ_p1940[1]+sb$pcTot_HU_SF_Vac_p1940[1]+sb$pcTot_HU_SF_Occ_1940_59[1]+sb$pcTot_HU_SF_Vac_1940_59[1])+
+#   sb$Tot_HU_MF[1]*(sb$pcTot_HU_MF_Occ_p1940[1]+sb$pcTot_HU_MF_Vac_p1940[1]+sb$pcTot_HU_MF_Occ_1940_59[1]+sb$pcTot_HU_MF_Vac_1940_59[1])+
+#   sb$Tot_HU_MH[1]*(sb$pcTot_HU_MH_Occ_p1940[1]+sb$pcTot_HU_MH_Vac_p1940[1]+sb$pcTot_HU_MH_Occ_1940_59[1]+sb$pcTot_HU_MH_Vac_1940_59[1]))/sb$Tot_Hous_Units[1]
+  
 summ_base<-smop_base[,-3]    # summary of stock changes, base scenario
 # identify counties with strong and sustained population decline
 sbs<-summ_base[order(summ_base$PopGrowthRel),][1:35,] # summ base sort
@@ -208,8 +219,67 @@ for (j in 1:51) {
   # smop_base$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],smop_base$County.StateAbb) # unnecessary
   codes$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],codes$County.StateAbb)
 }
-# this following line may then also be unneccesary
-# smop_hiDR$County.StateAbb<-smop_hiMF$County.StateAbb<-smop_hiDRMF$County.StateAbb<-smop_base$County.StateAbb
+# calculate and visualize stock growth vs % pre-1960 ########### not very impressive graph at county level
+fit <- lm(PopGrowthRel~pc_pre60, data=summ_base)
+windows()
+plot(summ_base$pc_pre60,summ_base$PopGrowthRel)
+lines(summ_base$pc_pre60, fitted(fit), col="blue")
+
+summ_base$State_FIPS<-as.numeric(substr(summ_base$GeoID,1,2))
+
+summ_base<-merge(summ_base,st)
+
+stsum<-as.data.frame(tapply(summ_base$SGrowthAbs,summ_base$STUSAB,sum))
+stsum$State<-rownames(stsum)
+names(stsum)[1]<-"StockGrowthAbs"
+stsum$Stock2020<-tapply(summ_base$tot_HU,summ_base$STUSAB,sum)
+stsum$StockGrowthRel<-stsum$StockGrowthAbs/stsum$Stock2020
+stsum$pre60Abs<-tapply(summ_base$abs_pre60,summ_base$STUSAB,sum)
+stsum$pre60Rel<-stsum$pre60Abs/stsum$Stock2020
+
+stfit<-lm(StockGrowthRel~pre60Rel,data=stsum)
+stsum2<-stsum[stsum$State!="DC",]
+stfit2<-lm(StockGrowthRel~pre60Rel,data=stsum2)
+stsum$fit<-fitted(stfit)
+stsum2$fit2<-fitted(stfit2)
+
+windows()
+p<-ggplot(stsum,aes(pre60Rel,StockGrowthRel,label=State))
+p + geom_point(col="cadetblue") + geom_text(hjust=0,nudge_x=0.005) + geom_line(data=stsum2,aes(pre60Rel,fit2),col="brown2",size=1) +
+  scale_y_continuous(labels = scales::percent,breaks = c(-0.2,0,0.2, 0.4, 0.6,0.8,1)) +  scale_x_continuous(labels = scales::percent,limits = c(0.045, 0.6),breaks=c(0.1,0.2,0.3,0.4,0.5,0.6)) +
+  labs(title = "Projected Stock Growth vs 2020 Stock Age Profile",y= "Relative Housing Stock Growth, 2020-2060",x="Percent of 2020 Stock Built Pre-1960") + theme_bw() +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 14, face = "bold"))
+
+load("../StockModelCode/buildstock100.RData")
+czs<-as.data.frame(table(rs$State,rs$Building.America.Climate.Zone))
+czs<-czs[czs$Freq>0,]
+names(czs)[1:2]<-c("State","CZ")
+rownames(czs)<-1:nrow(czs)
+
+czs$CZ<-as.character(czs$CZ)
+czs2<-data.frame(State=unique(czs$State),CZ="NA",Freq=0)
+for (i in 1: nrow(czs2)) {
+  czs2[i,]<-czs[which(czs$Freq==max(czs[czs$State==czs2[i,]$State,]$Freq)),]
+}
+czse<-data.frame(State=c("AK","HI"),CZ=c("Very Cold","Hot-Humid"),Freq=c(0,0))
+czs2<-rbind(czs2,czse)
+stsum<-merge(stsum,czs2)
+
+stsum[stsum$CZ=="Hot-Humid",]$CZ<-"1. Hot-Humid"
+stsum[stsum$CZ %in% c("Hot-Dry","Mixed-Dry"), ]$CZ<-"2. Hot/Mixed-Dry"
+stsum[stsum$CZ=="Marine",]$CZ<-"3. Marine"
+stsum[stsum$CZ=="Mixed-Humid",]$CZ<-"4. Mixed-Humid"
+stsum[stsum$CZ %in% c("Cold","Very Cold"),]$CZ<-"5. Cold/Very Cold"
+# stsum[stsum$CZ=="Very Cold",]$CZ<-"6. Very Cold"
+
+
+windows()
+p<-ggplot(stsum,aes(pre60Rel,StockGrowthRel,label=State))
+p + geom_point(aes(col=CZ)) + geom_text(hjust=0,nudge_x=0.005) + geom_line(data=stsum2,aes(pre60Rel,fit2),col="brown2",size=1) +
+  scale_y_continuous(labels = scales::percent,breaks = c(-0.2,0,0.2, 0.4, 0.6,0.8,1)) +  scale_x_continuous(labels = scales::percent,limits = c(0.045, 0.6),breaks=c(0.1,0.2,0.3,0.4,0.5,0.6)) +
+  labs(title = "Projected Stock Growth vs 2020 Stock Age Profile",y= "Relative Housing Stock Growth, 2020-2060",x="Percent of 2020 Stock Built Pre-1960") + theme_bw() +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 14, face = "bold")) +
+  scale_color_manual(values=as.vector(warmcool(7))) # need a package for this 
 
 # extract template for making US summary results, for each scenario ##########
 us_base<-as.data.frame(smop_base[[3]][[1]][,c(1:31,110:169)])
@@ -326,8 +396,8 @@ us_hiDRMF[,18:21]<-us_hiDRMF[,22:25]/us_hiDRMF[,14:17]
 # calculate addition (con) and loss (dem) rates
 us_hiDRMF[,c("Con_Rate_SF","Con_Rate_MF","Con_Rate_MH")]<-us_hiDRMF[,c("Con_SF","Con_MF","Con_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
 us_hiDRMF[,c("Dem_Rate_SF","Dem_Rate_MF","Dem_Rate_MH")]<-us_hiDRMF[,c("Dem_SF","Dem_MF","Dem_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
-save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="Summary_results/US_smop_scenarios.RData")
-# load("HSM_results/US_smop_scenarios.RData")
+# save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="Summary_results/US_smop_scenarios.RData")
+load("Summary_results/US_smop_scenarios.RData")
 # figure out how many occupied new constructions exist every 5 years for each scenario ##############
 new_OU_base<-us_base[c(seq(1,41,5)),c(2,38:41,58:61,78:81)] # extract columns of Year, and Tot occupied units by type and new cohort
 new_OU_base$Tot_New_OU<-0
@@ -391,7 +461,7 @@ newcon_sy<-matrix(c(new_OU_base$Tot_New_OU,new_OU_hiDR$Tot_New_OU,new_OU_hiMF$To
 write.csv(newcon_sy,file="HSM_results/NewConEstimates.csv")
 # visualize us summary scenario results ##############
 # scenarios<-c("Baseline","High Demolition","High MF Share","High Demolition & MF Share")
-scenarios<-c("1. Baseline","2. High Turnover","3. High Multifamily Growth","4. High Turnover & Multifamily Growth")
+scenarios<-c("1. Baseline","2. High Turnover","3. High Multifamily","4. High Turnover & Multifamily") # removed "Growth" from hi MF scenario titles
 scen_name<-c("base","hiDR","hiMF","hiDRMF")
 location<-"USA"
 graphics.off()
@@ -420,11 +490,11 @@ names(pop)[3:4]<-c("Type","Population")
 pop$Type<-substr(pop$Type,5,6)
 
 # windows()
-g<-ggplot(pop,aes(x=Year,y=1e-6*Population,group=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::comma) +
-  labs(title = paste("Population by house type, 2020-2060,",location),subtitle = scenarios[scen],y= "Population (Millions)") + theme_bw() +
-  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
+# g<-ggplot(pop,aes(x=Year,y=1e-6*Population,group=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::comma) +
+#   labs(title = paste("Population by house type, 2020-2060,",location),subtitle = scenarios[scen],y= "Population (Millions)") + theme_bw() +
+#   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g
-ggsave(paste("Pop_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+# ggsave(paste("Pop_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
 
 # pop share
 if (scen %% 2 == 1) {
@@ -435,8 +505,8 @@ pop_sh$Type<-substr(pop_sh$Type,11,12)
 g<-ggplot(pop_sh,aes(x=Year,y=`Population Share`,group=Type))+geom_point(aes(color=Type)) +scale_y_continuous(labels=scales::percent) +
   labs(title = paste("Population share by house type, 2020-2060,",location ),subtitle = scenarios[scen]) + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-# g
-ggsave(paste("PopShare_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ g
+# ggsave(paste("PopShare_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
 }
 
 # Occupied housing units total
@@ -449,7 +519,7 @@ g<-ggplot(ohu,aes(x=Year,y=0.001*`Occupied Units`,group=Type))+geom_point(aes(co
   labs(title = paste("Occupied housing units by type, 2020-2060,",location),subtitle = scenarios[scen], y = "Occupied Units (1,000 Units)") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g
-ggsave(paste("OHU_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+# ggsave(paste("OHU_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
 
 # Occupied housing units share
 OHU<-df[,c(1,2,15:17)]
@@ -472,14 +542,14 @@ cd[cd$Flow=="Con",]$Flow<-"Add"
 cd$Type<-substr(cd$variable,5,6)
 names(cd)[3]<-c("Flow_Type")
 cd<-cd[cd$Year<2060,]
-# windows() # +geom_line(aes(color=Type)) removed the lines
+windows(width = 5.7,height = 5.1) # +geom_line(aes(color=Type)) removed the lines
 g<-ggplot(cd,aes(x=Year,y=0.001*value,group=Flow_Type))+geom_point(aes(color=Type, shape=Flow),size=2) + scale_y_continuous(limits = c(0,1900), labels = scales::comma) +
   labs(title = paste("Stock additions and losses, 2020-2060,",location ),subtitle = scenarios[scen], y = "Stock additions and losses (1,000 Units/yr)") + theme_bw() + scale_shape_manual(values = c(16, 2)) + 
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
 assign(paste("condem_",scen_name[scen],sep = ""),g)
-# g
+g
 # ggsave(paste("ConDem_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 7,height = 5.5)
-ggsave(paste("ConDem_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
+# ggsave(paste("ConDem_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
 
 # vacancy rates
 vr<-melt(df[,c(1,2,18:21)],id = c("GeoID","Year"))
@@ -491,7 +561,7 @@ g<-ggplot(vr,aes(x=Year,y=`Vacancy Ratio`,group=Type))+geom_point(aes(color=Type
   labs(title = paste("Vacancy Factor by house type, 2020-2060,",location),subtitle = scenarios[scen], y = "Vacancy Factor (Tot. Units/Occ. Units)") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
 # g
-ggsave(paste("VacRat_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+# ggsave(paste("VacRat_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
 
 # construction and demolition rates
 cdr<-melt(df[,c(1,2,93:98)],id = c("GeoID","Year"))
@@ -507,7 +577,7 @@ g<-ggplot(cdr,aes(x=Year,y=value,group=Flow_Type))+geom_line(aes(color=Type, lin
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g
 assign(paste("condemRate_",scen_name[scen],sep = ""),g)
-ggsave(paste("ConDemRat_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 7,height = 5)
+# ggsave(paste("ConDemRat_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 7,height = 5)
 
 # housing stock by cohort (area chart) for each house type
 tc<-melt(df[,c(1,2,100:129)],id = c("GeoID","Year")) # for the us version
@@ -524,7 +594,7 @@ g<-ggplot(tc_sf,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area(
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
 # g
 assign(paste("SF_Coh_",scen_name[scen],sep = ""),g)
-ggsave(paste("SF_Coh_US_",  scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
+# ggsave(paste("SF_Coh_US_",  scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
 
 tc_mf<-tc[tc$Type=="MF",]
 tc_mf$order<-rep(rev(c(1:10)),each=41)
@@ -534,7 +604,7 @@ g<-ggplot(tc_mf,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area(
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g
 assign(paste("MF_Coh_",scen_name[scen],sep = ""),g)
-ggsave(paste("MF_Coh_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
+# ggsave(paste("MF_Coh_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
 
 tc_mh<-tc[tc$Type=="MH",]
 tc_mh$order<-rep(rev(c(1:10)),each=41)
@@ -544,17 +614,20 @@ g<-ggplot(tc_mh,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area(
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g
 assign(paste("MH_Coh_",scen_name[scen],sep = ""),g)
-ggsave(paste("MH_Coh_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
+# ggsave(paste("MH_Coh_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
 
 }
 # make individual plots to copy into manuscript ##########
-# plots for manuscript Fig 3
+# plots for manuscript Fig 2
 # adjust window to approx dev.size("in") = 5.1 x 5.1
 windows(width = 5.2, height = 5.1)
+condem_base
 condem_base+theme(legend.position = "none")
 condem_hiDR+theme(legend.position = "none")
 condem_hiMF+theme(legend.position = "none")
 condem_hiDRMF+theme(legend.position = "none")
+
+condem_base+theme(legend.position = "none")+labs(title = paste("Stock additions and losses, 2020-2060,",location ),subtitle = "1. Baseline;  5. Reduced Floor Area", y = "Stock additions and losses (1,000 Units/yr)")
 
 # plots for manuscript Fig 4
 windows(width = 6.415, height = 5.415)
@@ -563,10 +636,42 @@ SF_Coh_hiDRMF
 
 MF_Coh_base
 MF_Coh_hiDRMF
+# 
+# emf('Figures/Files for AI/Orig_emf/fig4_1.emf',width = 6.415, height = 5.415)
+# SF_Coh_base
+# dev.off()
+# 
+# emf('Figures/Files for AI/Orig_emf/fig4_2.emf',width = 6.415, height = 5.415)
+# SF_Coh_hiDRMF
+# dev.off()
+# 
+# emf('Figures/Files for AI/Orig_emf/fig4_3.emf',width = 6.415, height = 5.415)
+# MF_Coh_base
+# dev.off()
+# 
+# emf('Figures/Files for AI/Orig_emf/fig4_4.emf',width = 6.415, height = 5.415)
+# MF_Coh_hiDRMF
+# dev.off()
+
+tiff("Figures/Files for AI/Original Tiff/fig3_1.tiff", units="in", width=6.415, height=5.415,res=300)
+SF_Coh_base
+dev.off()
+
+tiff("Figures/Files for AI/Original Tiff/fig3_2.tiff", units="in", width=6.415, height=5.415,res=300)
+SF_Coh_hiDRMF
+dev.off()
+
+tiff("Figures/Files for AI/Original Tiff/fig3_3.tiff", units="in", width=6.415, height=5.415,res=300)
+MF_Coh_base
+dev.off()
+
+tiff("Figures/Files for AI/Original Tiff/fig3_4.tiff", units="in", width=6.415, height=5.415,res=300)
+MF_Coh_hiDRMF
+dev.off()
 
 # now make graphs for individual counties ###############
 smop_scenarios<-c("smop_base","smop_hiDR","smop_hiMF","smop_hiDRMF")
-scenarios<-c("1. Baseline","2. High Turnover","3. High Multifamily Growth","4. High Turnover & MF Growth")
+scenarios<-c("1. Baseline","2. High Turnover","3. High Multifamily","4. High Turnover & Multifamily")
 # scenarios<-c("1. Baseline","2. High Turnover","3. High Multifamily","4. High TO & MF")
 scen_name<-c("base","hiDR","hiMF","hiDRMF")
 graphics.off()
@@ -634,7 +739,7 @@ cd<-cd[cd$Year<2060,]
 g<-ggplot(cd,aes(x=Year,y=value,group=Flow_Type))+geom_point(aes(color=Type, shape=Flow),size=2) + scale_y_continuous(labels = scales::comma) +
   labs(title = paste("Construction and demolition, 2020-2060,",location ),subtitle = scenarios[scen], y = "Annual construction and demolition") + theme_bw() + scale_shape_manual(values = c(16, 2)) + 
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("ConDem", as.character(cty), "_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ggsave(paste("ConDem", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 
 # vacancy rates
 vr<-melt(df[,c(1,2,18:21)],id = c("GeoID","Year"))
@@ -644,7 +749,7 @@ vr<-vr[!vr$Type=="Tot",]
 g<-ggplot(vr,aes(x=Year,y=(`Vacancy Ratio`-1)/`Vacancy Ratio`,group=Type))+geom_point(aes(color=Type),size=2) + scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   labs(title = paste("Vacancy Rate by house type, 2020-2060,",location),subtitle = scenarios[scen], y = "Vacancy Rate") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("VacRate", as.character(cty), "_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ggsave(paste("VacRate", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 assign(paste("VacRate", as.character(cty), "_", scen_name[scen],sep=""),g)
 
 # construction and demolition rates
@@ -659,7 +764,7 @@ cdr<-cdr[cdr$Year<2060,]
 g<-ggplot(cdr,aes(x=Year,y=value,group=Flow_Type))+geom_point(aes(color=Type, shape=Flow),size=2)  + scale_y_continuous(labels = scales::percent) +
   labs(title = paste("Stock Addition and Loss Rates,",location ),subtitle = scenarios[scen], y = "Add, Loss Rate") + theme_bw() + scale_shape_manual(values = c(16, 2)) +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-ggsave(paste("ConDemRate", as.character(cty), "_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ggsave(paste("ConDemRate", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 assign(paste("ConDemRate", as.character(cty), "_", scen_name[scen],sep=""),g)
 
 # housing stock by cohort (area chart) for each house type
@@ -675,7 +780,7 @@ tc_sf$order<-rep(rev(c(1:10)),each=41)
 g<-ggplot(tc_sf,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area() + scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = paste("Total Single-Family Units by Cohort,",location ),subtitle = scenarios[scen], y = "Total SF Stock (1,000 Units)",fill="Cohort") + theme_bw() + scale_fill_brewer(palette="Paired")+
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-ggsave(paste("SF_Coh", as.character(cty), "_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ggsave(paste("SF_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 
 tc_mf<-tc[tc$Type=="MF",]
 tc_mf$order<-rep(rev(c(1:10)),each=41)
@@ -683,7 +788,7 @@ tc_mf$order<-rep(rev(c(1:10)),each=41)
 g<-ggplot(tc_mf,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area() + scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = paste("Total Multifamily Units by Cohort,",location ),subtitle = scenarios[scen],y = "Total MF Stock (1,000 Units)",fill="Cohort") + theme_bw() + scale_fill_brewer(palette="Paired")+
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("MF_Coh", as.character(cty), "_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ggsave(paste("MF_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 assign(paste("MF_Coh", as.character(cty), "_", scen_name[scen],sep=""),g)
 
 tc_mh<-tc[tc$Type=="MH",]
@@ -692,7 +797,7 @@ tc_mh$order<-rep(rev(c(1:10)),each=41)
 g<-ggplot(tc_mh,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area() + scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = paste("Total Manuf. Housing Units by Cohort,",location ),subtitle = scenarios[scen],  y = "Total MH Stock (1,000 Units)",fill="Cohort") + theme_bw() + scale_fill_brewer(palette="Paired")+
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("MH_Coh", as.character(cty), "_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+ggsave(paste("MH_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 
 # graph dem rates by age group, by house type and census region
 # dr<-melt(cty_df[1,c(1,2,170:187)],id = c("GeoID","Year"))
