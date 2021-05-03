@@ -397,7 +397,7 @@ us_hiDRMF[,18:21]<-us_hiDRMF[,22:25]/us_hiDRMF[,14:17]
 us_hiDRMF[,c("Con_Rate_SF","Con_Rate_MF","Con_Rate_MH")]<-us_hiDRMF[,c("Con_SF","Con_MF","Con_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
 us_hiDRMF[,c("Dem_Rate_SF","Dem_Rate_MF","Dem_Rate_MH")]<-us_hiDRMF[,c("Dem_SF","Dem_MF","Dem_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
 # save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="Summary_results/US_smop_scenarios.RData")
-load("Summary_results/US_smop_scenarios.RData")
+load("HSM_results/US_smop_scenarios.RData")
 # figure out how many occupied new constructions exist every 5 years for each scenario ##############
 new_OU_base<-us_base[c(seq(1,41,5)),c(2,38:41,58:61,78:81)] # extract columns of Year, and Tot occupied units by type and new cohort
 new_OU_base$Tot_New_OU<-0
@@ -514,9 +514,13 @@ ohu<-melt(df[,c(1,2,15:17)],id = c("GeoID","Year"))
 names(ohu)[3:4]<-c("Type","Occupied Units")
 location<-codes[codes$GeoID==as.numeric(ohu$GeoID[1]),]$County.State
 ohu$Type<-substr(ohu$Type,8,9)
-# windows()
-g<-ggplot(ohu,aes(x=Year,y=0.001*`Occupied Units`,group=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::comma) +
+windows()
+ggplot(ohu,aes(x=Year,y=0.001*`Occupied Units`,group=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::comma) +
   labs(title = paste("Occupied housing units by type, 2020-2060,",location),subtitle = scenarios[scen], y = "Occupied Units (1,000 Units)") + theme_bw() +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
+windows()
+ggplot(ohu,aes(x=Year,y=1e-6*`Occupied Units`,fill=Type)) + geom_col() +
+  labs(title = paste("Occupied housing units by type, 2020-2060,",location),subtitle = scenarios[scen], y = "Million Housing Units") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g
 # ggsave(paste("OHU_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
@@ -527,8 +531,8 @@ OHU[,3:5]<-OHU[,3:5]/rowSums(OHU[,3:5])
 ohus<-melt(OHU,id = c("GeoID","Year"))
 names(ohus)[3:4]<-c("Type","Occupied Units")
 ohus$Type<-substr(ohus$Type,8,9)
-# windows()
-g<-ggplot(ohus,aes(x=Year,y=`Occupied Units`,group=Type))+geom_line(aes(color=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::percent) +
+windows()
+ggplot(ohus,aes(x=Year,y=`Occupied Units`,group=Type))+geom_line(aes(color=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::percent) +
   labs(title = paste("Occupied housing units by type, 2020-2060,",location ),subtitle = scenarios[scen]) + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 # g

@@ -6,15 +6,20 @@ library(ggplot2)
 library(reshape2)
 library(RColorBrewer)
 setwd("~/Yale Courses/Research/Final Paper/HSM_github")
-# bs2020<-read.csv('../resstock_scenarios/scen_bscsv/bs2020_180k.csv') # read the large file containing 150,000 size sample of the 2020 occupied housing stock
+# bs2020<-read.csv('../resstock_projections/scen_bscsv/bs2020_180k.csv') # read the large file containing 180k sample of the 2020 occupied housing stock
 # save(bs2020,file="Resstock_outputs/bs2020_180k.RData")
 load("Resstock_outputs/bs2020_180k.RData")
-load("Resstock_outputs/bs_baseRFA.RData")
+load("Resstock_outputs/bs_baseRFA.RData") # created by bs_adjust in the energy GHG projection repository
+# load("Resstock_outputs/bs_hiDRRFA.RData") 
+# load("Resstock_outputs/bs_hiMFRFA.RData")
+# load("Resstock_outputs/bs_base.RData") 
 load("Intermediate_results/InitStock20.RData")
-load("Summary_results/US_smop_scenarios.RData") # us summary of stock model, created in the smvis3 script, with the updated (#3) stock model
+load("HSM_results/US_smop_scenarios.RData") # us summary of stock model, created in the smvis3 script, with the updated (#3) stock model
 load("Intermediate_results/ctycode.RData")
 
 bsRFA<-bs_baseRFA[,1:113]
+# bshiDRRFA<-bs_hiDRRFA[,1:113]
+# bshiMFRFA<-bs_hiMFRFA[,1:113]
 # check the distribution of housing types
 ht<-table(bs2020$Geometry.Building.Type.RECS)/nrow(bs2020) # as expected, SF makes up about 68% of total occupied units
 # lets show that it matches well
@@ -147,7 +152,7 @@ bsRFA[bsRFA$Geometry.Floor.Area=="2000-2499"&bsRFA$Type3=="MF",]$Floor.Area.m2<-
 bsRFA[bsRFA$Geometry.Floor.Area=="2500-2999"&bsRFA$Geometry.Building.Type.RECS %in% c("Single-Family Detached","Mobile Home"),]$Floor.Area.m2<-round(2663/10.765,1)
 bsRFA[bsRFA$Geometry.Floor.Area=="2500-2999"&bsRFA$Geometry.Building.Type.RECS == "Single-Family Attached",]$Floor.Area.m2<-round(2631/10.765,1)
 bsRFA[bsRFA$Geometry.Floor.Area=="2500-2999"&bsRFA$Type3=="MF",]$Floor.Area.m2<-round(2590/10.765,1)
-# These dont exist in RFA 
+# 
 # bsRFA[bsRFA$Geometry.Floor.Area=="3000-3999"&bsRFA$Geometry.Building.Type.RECS %in% c("Single-Family Detached","Mobile Home"),]$Floor.Area.m2<-round(3301/10.765,1)
 # bsRFA[bsRFA$Geometry.Floor.Area=="3000-3999"&bsRFA$Geometry.Building.Type.RECS == "Single-Family Attached",]$Floor.Area.m2<-round(3241/10.765,1)
 # bsRFA[bsRFA$Geometry.Floor.Area=="3000-3999"&bsRFA$Type3=="MF",]$Floor.Area.m2<-round(3138/10.765,1)
@@ -184,8 +189,10 @@ mFA$Cohort<-as.character(mFA$Cohort)
 mFA[28:39,]$Cohort<-rep(c("2020s","2030s","2040s","2050s"),each=3)
 mFA_all<-rbind(mFA,mFA_RFA)
 mFA_all$Type_Scen<-paste(mFA_all$Type,mFA_all$Scenario,sep="_")
+mFA_all$Characteristics<-"Base"
+mFA_all[mFA_all$Scenario=="5. Red. FA",]$Characteristics<-"Reduced FA"
 windows()
-ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Scenario),size=1)+geom_point(aes(color=Type),size=2) + 
+ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Characteristics),size=1)+geom_point(aes(color=Type),size=2) + 
   labs(title = "Mean floor area of house types by cohort", y = "Mean Floor Area (m2)") + theme_bw() + ylim(c(10,260)) +
   theme(axis.text=element_text(size=12),axis.title=element_text(size=14,face = "bold"),plot.title = element_text(size = 15, face = "bold"), 
         legend.title=element_text(size=12), legend.text=element_text(size=11))
@@ -330,6 +337,20 @@ for (k in 3:14) {
   }
 }
 
+# alter meanFA dfs so that the RFA version never has larger floor areas than the regular version
+
+for (j in 1:3108) { 
+  if (meanFA_tcc_RFA$MF.2020s[j]>meanFA_tcc$MF.2010s[j]) {
+    meanFA_tcc_RFA$MF.2020s[j]<-meanFA_tcc$MF.2010s[j]
+  }
+  if (meanFA_tcc_RFA$SF.2020s[j]>meanFA_tcc$SF.2010s[j]) {
+    meanFA_tcc_RFA$SF.2020s[j]<-meanFA_tcc$SF.2010s[j]
+  }
+  if (meanFA_tcc_RFA$MH.2020s[j]>meanFA_tcc$MH.2010s[j]) {
+    meanFA_tcc_RFA$MH.2020s[j]<-meanFA_tcc$MH.2010s[j]
+  }
+}
+
 # area and material  calculations ############
 load("HSM_results/County_Scenario_SM_Results.RData") # 
 SF_dem_factor<-0.35 # how much of SF homes leaving the stock are actually demolished right away?
@@ -347,7 +368,10 @@ smop_hiDR<-smop_hiDR[-c(which(substr(smop_hiDR$GeoID,1,2) %in% c("02","15"))),]
 smop_hiMF<-smop_hiMF[-c(which(substr(smop_hiMF$GeoID,1,2) %in% c("02","15"))),]
 smop_hiDRMF<-smop_hiDRMF[-c(which(substr(smop_hiDRMF$GeoID,1,2) %in% c("02","15"))),]
 
+# define the RFA data frames, only for the first 3 stock scenarios
 smop_RFA<-smop_base
+smop_hiDR_RFA<-smop_hiDR
+smop_hiMF_RFA<-smop_hiMF
 
 all.equal(meanFA_tcc$GeoID,smop_base$GeoID) # if this is true, can just transplant the mean FA into the smop files
 all.equal(meanFA_tcc$GeoID,smop_hiDR$GeoID) # if this is true, can just transplant the mean FA into the smop files
@@ -361,8 +385,15 @@ smop_hiDR[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
 smop_hiMF[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
 smop_hiDRMF[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
 smop_RFA[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
-smop_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
+smop_hiDR_RFA[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
+smop_hiMF_RFA[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
 
+# define different floor areas for new construction in the RFA scenarios
+smop_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
+smop_hiDR_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
+smop_hiMF_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
+
+# now calculate m2/cap per house type in each county for each scenario ###########
 for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county
   print(i)
   smop_base[[3]][[i]]<-as.data.frame(smop_base[[3]][[i]])
@@ -962,7 +993,250 @@ for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. 
   smop_RFA[[3]][[i]]$m2cap_MH<-smop_RFA[[3]][[i]]$Occ_m2_MH/smop_RFA[[3]][[i]]$Pop_MH
   smop_RFA[[3]][[i]]$m2cap<-smop_RFA[[3]][[i]]$Occ_m2/smop_RFA[[3]][[i]]$Population
 }
+
+for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. Can redo the providence file here with runnung only i=2281
+  print(i)
+  smop_hiDR_RFA[[3]][[i]]<-as.data.frame(smop_hiDR_RFA[[3]][[i]])
+  
+  smop_hiDR_RFA[[3]][[i]]$m2cap<-smop_hiDR_RFA[[3]][[i]]$m2cap_MH<-smop_hiDR_RFA[[3]][[i]]$m2cap_MF<- smop_hiDR_RFA[[3]][[i]]$m2cap_SF<-
+    smop_hiDR_RFA[[3]][[i]]$Occ_m2<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF<-
+    smop_hiDR_RFA[[3]][[i]]$Tot_NC_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MH_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_SF_m2<-
+    smop_hiDR_RFA[[3]][[i]]$Tot_Dem_m2<-smop_hiDR_RFA[[3]][[i]]$Dem_MH_m2<-smop_hiDR_RFA[[3]][[i]]$Dem_MF_m2<-smop_hiDR_RFA[[3]][[i]]$Dem_SF_m2<-
+    smop_hiDR_RFA[[3]][[i]]$Tot_NC<-smop_hiDR_RFA[[3]][[i]]$NC_MH<-smop_hiDR_RFA[[3]][[i]]$NC_MF<-smop_hiDR_RFA[[3]][[i]]$NC_SF<-0
+  
+  for (y in 1:10) { #2020-2029 New construction
+    smop_hiDR_RFA[[3]][[i]]$NC_SF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2020_29[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2020_29[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2020_29[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2020_29[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_SF_Occ_2020_29[y]+smop_hiDR_RFA[[3]][[i]]$Dem_SF_Vac_2020_29[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2020_29[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2020_29[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2020_29[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2020_29[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MF_Occ_2020_29[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MF_Vac_2020_29[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MH[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2020_29[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2020_29[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2020_29[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2020_29[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MH_Occ_2020_29[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MH_Vac_2020_29[y]
+  }
+  
+  for (y in 11:20) { #2030-2039 New construction
+    smop_hiDR_RFA[[3]][[i]]$NC_SF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2030_39[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2030_39[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2030_39[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2030_39[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_SF_Occ_2030_39[y]+smop_hiDR_RFA[[3]][[i]]$Dem_SF_Vac_2030_39[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2030_39[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2030_39[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2030_39[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2030_39[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MF_Occ_2030_39[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MF_Vac_2030_39[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MH[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2030_39[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2030_39[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2030_39[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2030_39[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MH_Occ_2030_39[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MH_Vac_2030_39[y]
+  }
+  
+  for (y in 21:30) { #2040-2049 New construction
+    smop_hiDR_RFA[[3]][[i]]$NC_SF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2040_49[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2040_49[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2040_49[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2040_49[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_SF_Occ_2040_49[y]+smop_hiDR_RFA[[3]][[i]]$Dem_SF_Vac_2040_49[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2040_49[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2040_49[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2040_49[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2040_49[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MF_Occ_2040_49[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MF_Vac_2040_49[y]
+    
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MH[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2040_49[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2040_49[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2040_49[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2040_49[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MH_Occ_2040_49[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MH_Vac_2040_49[y]
+  }
+  for (y in 31:40) { #2050-2059 New construction
+    smop_hiDR_RFA[[3]][[i]]$NC_SF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2050_60[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2050_60[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Occ_2050_60[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_SF_Vac_2050_60[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_SF_Occ_2050_60[y]+smop_hiDR_RFA[[3]][[i]]$Dem_SF_Vac_2050_60[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MF[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2050_60[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2050_60[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Occ_2050_60[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MF_Vac_2050_60[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MF_Occ_2050_60[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MF_Vac_2050_60[y]
+    
+    smop_hiDR_RFA[[3]][[i]]$NC_MH[y]<-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2050_60[y+1]+smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2050_60[y+1]-
+      smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Occ_2050_60[y]-smop_hiDR_RFA[[3]][[i]]$Tot_HU_MH_Vac_2050_60[y]+
+      smop_hiDR_RFA[[3]][[i]]$Dem_MH_Occ_2050_60[y]+smop_hiDR_RFA[[3]][[i]]$Dem_MH_Vac_2050_60[y]
+  }
+  smop_hiDR_RFA[[3]][[i]][,316:318][which(smop_hiDR_RFA[[3]][[i]][,316:318]<0,arr.ind = TRUE)]<-0 # make sure no negative inflows
+  # NC_SFpc[is.infinite(NC_SFpc)]<-NaN
+  # correct for the extra loading of new construction towards the end of decades, by making the new construction be the same percentage of total construction in every year of each decade
+  # if (any(!is.na(smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_SF[1:40]))){ 
+  if (any(!is.na(smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_SF[1:40])&!is.infinite(smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_SF[1:40]))) {
+    NC_SFpc<-smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_SF[1:40]
+    # convert Infs to Nans, so that they can be removed in the mean function with na.rm
+    NC_SFpc[is.infinite(NC_SFpc)]<-NaN
+    NC_SFpc[which(is.nan(NC_SFpc))]<-mean(NC_SFpc,na.rm = TRUE)
+    smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]<-smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]*mean(NC_SFpc)/NC_SFpc*sum(smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40])/sum(smop_hiDR_RFA[[3]][[i]]$NC_SF[1:40]*mean(NC_SFpc)/NC_SFpc) }
+  
+  # if (any(!is.na(smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MF[1:40]))){ 
+  if (any(!is.na(smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MF[1:40])&!is.infinite(smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MF[1:40]))) {
+    NC_MFpc<-smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MF[1:40]
+    # convert Infs to Nans, so that they can be removed in the mean function with na.rm
+    NC_MFpc[is.infinite(NC_MFpc)]<-NaN
+    NC_MFpc[which(is.nan(NC_MFpc))]<-mean(NC_MFpc,na.rm = TRUE)
+    smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]<-smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]*mean(NC_MFpc)/NC_MFpc*sum(smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40])/sum(smop_hiDR_RFA[[3]][[i]]$NC_MF[1:40]*mean(NC_MFpc)/NC_MFpc) }
+  
+  # if (any(!is.na(smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MH[1:40]))){ 
+  if (any(!is.na(smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MH[1:40])&!is.infinite(smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MH[1:40]))) {
+    NC_MHpc<-smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiDR_RFA[[3]][[i]]$Con_MH[1:40]
+    # convert Infs to Nans, so that they can be removed in the mean function with na.rm
+    NC_MHpc[is.infinite(NC_MHpc)]<-NaN
+    NC_MHpc[which(is.nan(NC_MHpc))]<-mean(NC_MHpc,na.rm = TRUE)
+    smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]<-smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]*mean(NC_MHpc)/NC_MHpc*sum(smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40])/sum(smop_hiDR_RFA[[3]][[i]]$NC_MH[1:40]*mean(NC_MHpc)/NC_MHpc) }
+  # sum up total inflows to stock
+  smop_hiDR_RFA[[3]][[i]]$Tot_NC<-smop_hiDR_RFA[[3]][[i]]$NC_SF+smop_hiDR_RFA[[3]][[i]]$NC_MF+smop_hiDR_RFA[[3]][[i]]$NC_MH
+  
+  # New construction floor area inflows
+  smop_hiDR_RFA[[3]][[i]]$NC_SF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_SF*c(rep(smop_hiDR_RFA$FA.SF.2020s[i],10),rep(smop_hiDR_RFA$FA.SF.2030s[i],10),rep(smop_hiDR_RFA$FA.SF.2040s[i],10),rep(smop_hiDR_RFA$FA.SF.2050s[i],11))
+  smop_hiDR_RFA[[3]][[i]]$NC_MF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MF*c(rep(smop_hiDR_RFA$FA.MF.2020s[i],10),rep(smop_hiDR_RFA$FA.MF.2030s[i],10),rep(smop_hiDR_RFA$FA.MF.2040s[i],10),rep(smop_hiDR_RFA$FA.MF.2050s[i],11))
+  smop_hiDR_RFA[[3]][[i]]$NC_MH_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MH*c(rep(smop_hiDR_RFA$FA.MH.2020s[i],10),rep(smop_hiDR_RFA$FA.MH.2030s[i],10),rep(smop_hiDR_RFA$FA.MH.2040s[i],10),rep(smop_hiDR_RFA$FA.MH.2050s[i],11))
+  smop_hiDR_RFA[[3]][[i]]$Tot_NC_m2<-smop_hiDR_RFA[[3]][[i]]$NC_SF_m2+smop_hiDR_RFA[[3]][[i]]$NC_MF_m2+smop_hiDR_RFA[[3]][[i]]$NC_MH_m2
+  # Demolition floor area outflows, using dem factors to convert stock losses to actual demolitions. Not currently calculating columns for total demolitions by type. but can sum up the groups of columns if needed to do so
+  smop_hiDR_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))+
+    rowSums(smop_hiDR_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))+
+    rowSums(smop_hiDR_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))+
+    rowSums(smop_hiDR_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Tot_Dem_m2<-smop_hiDR_RFA[[3]][[i]]$Dem_SF_m2+smop_hiDR_RFA[[3]][[i]]$Dem_MF_m2+smop_hiDR_RFA[[3]][[i]]$Dem_MH_m2
+  
+  # total occupied floor area stock by type,now using update RFA assumption on floor area of new housing
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_hiDR_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_hiDR_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_hiDR_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF+smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF+smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH
+  
+  smop_hiDR_RFA[[3]][[i]]$m2cap_SF<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF/smop_hiDR_RFA[[3]][[i]]$Pop_SF
+  smop_hiDR_RFA[[3]][[i]]$m2cap_MF<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF/smop_hiDR_RFA[[3]][[i]]$Pop_MF
+  smop_hiDR_RFA[[3]][[i]]$m2cap_MH<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH/smop_hiDR_RFA[[3]][[i]]$Pop_MH
+  smop_hiDR_RFA[[3]][[i]]$m2cap<-smop_hiDR_RFA[[3]][[i]]$Occ_m2/smop_hiDR_RFA[[3]][[i]]$Population
+}
+
+for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. Can redo the providence file here with runnung only i=2281
+  print(i)
+  smop_hiMF_RFA[[3]][[i]]<-as.data.frame(smop_hiMF_RFA[[3]][[i]])
+  
+  smop_hiMF_RFA[[3]][[i]]$m2cap<-smop_hiMF_RFA[[3]][[i]]$m2cap_MH<-smop_hiMF_RFA[[3]][[i]]$m2cap_MF<- smop_hiMF_RFA[[3]][[i]]$m2cap_SF<-
+    smop_hiMF_RFA[[3]][[i]]$Occ_m2<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF<-
+    smop_hiMF_RFA[[3]][[i]]$Tot_NC_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MH_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_SF_m2<-
+    smop_hiMF_RFA[[3]][[i]]$Tot_Dem_m2<-smop_hiMF_RFA[[3]][[i]]$Dem_MH_m2<-smop_hiMF_RFA[[3]][[i]]$Dem_MF_m2<-smop_hiMF_RFA[[3]][[i]]$Dem_SF_m2<-
+    smop_hiMF_RFA[[3]][[i]]$Tot_NC<-smop_hiMF_RFA[[3]][[i]]$NC_MH<-smop_hiMF_RFA[[3]][[i]]$NC_MF<-smop_hiMF_RFA[[3]][[i]]$NC_SF<-0
+  
+  for (y in 1:10) { #2020-2029 New construction
+    smop_hiMF_RFA[[3]][[i]]$NC_SF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2020_29[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2020_29[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2020_29[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2020_29[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_SF_Occ_2020_29[y]+smop_hiMF_RFA[[3]][[i]]$Dem_SF_Vac_2020_29[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2020_29[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2020_29[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2020_29[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2020_29[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MF_Occ_2020_29[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MF_Vac_2020_29[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MH[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2020_29[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2020_29[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2020_29[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2020_29[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MH_Occ_2020_29[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MH_Vac_2020_29[y]
+  }
+  
+  for (y in 11:20) { #2030-2039 New construction
+    smop_hiMF_RFA[[3]][[i]]$NC_SF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2030_39[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2030_39[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2030_39[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2030_39[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_SF_Occ_2030_39[y]+smop_hiMF_RFA[[3]][[i]]$Dem_SF_Vac_2030_39[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2030_39[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2030_39[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2030_39[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2030_39[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MF_Occ_2030_39[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MF_Vac_2030_39[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MH[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2030_39[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2030_39[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2030_39[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2030_39[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MH_Occ_2030_39[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MH_Vac_2030_39[y]
+  }
+  
+  for (y in 21:30) { #2040-2049 New construction
+    smop_hiMF_RFA[[3]][[i]]$NC_SF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2040_49[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2040_49[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2040_49[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2040_49[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_SF_Occ_2040_49[y]+smop_hiMF_RFA[[3]][[i]]$Dem_SF_Vac_2040_49[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2040_49[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2040_49[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2040_49[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2040_49[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MF_Occ_2040_49[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MF_Vac_2040_49[y]
+    
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MH[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2040_49[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2040_49[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2040_49[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2040_49[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MH_Occ_2040_49[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MH_Vac_2040_49[y]
+  }
+  for (y in 31:40) { #2050-2059 New construction
+    smop_hiMF_RFA[[3]][[i]]$NC_SF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2050_60[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2050_60[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Occ_2050_60[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_SF_Vac_2050_60[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_SF_Occ_2050_60[y]+smop_hiMF_RFA[[3]][[i]]$Dem_SF_Vac_2050_60[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MF[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2050_60[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2050_60[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Occ_2050_60[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MF_Vac_2050_60[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MF_Occ_2050_60[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MF_Vac_2050_60[y]
+    
+    smop_hiMF_RFA[[3]][[i]]$NC_MH[y]<-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2050_60[y+1]+smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2050_60[y+1]-
+      smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Occ_2050_60[y]-smop_hiMF_RFA[[3]][[i]]$Tot_HU_MH_Vac_2050_60[y]+
+      smop_hiMF_RFA[[3]][[i]]$Dem_MH_Occ_2050_60[y]+smop_hiMF_RFA[[3]][[i]]$Dem_MH_Vac_2050_60[y]
+  }
+  smop_hiMF_RFA[[3]][[i]][,316:318][which(smop_hiMF_RFA[[3]][[i]][,316:318]<0,arr.ind = TRUE)]<-0 # make sure no negative inflows
+  # NC_SFpc[is.infinite(NC_SFpc)]<-NaN
+  # correct for the extra loading of new construction towards the end of decades, by making the new construction be the same percentage of total construction in every year of each decade
+  # if (any(!is.na(smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_SF[1:40]))){ 
+  if (any(!is.na(smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_SF[1:40])&!is.infinite(smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_SF[1:40]))) {
+    NC_SFpc<-smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_SF[1:40]
+    # convert Infs to Nans, so that they can be removed in the mean function with na.rm
+    NC_SFpc[is.infinite(NC_SFpc)]<-NaN
+    NC_SFpc[which(is.nan(NC_SFpc))]<-mean(NC_SFpc,na.rm = TRUE)
+    smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]<-smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]*mean(NC_SFpc)/NC_SFpc*sum(smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40])/sum(smop_hiMF_RFA[[3]][[i]]$NC_SF[1:40]*mean(NC_SFpc)/NC_SFpc) }
+  
+  # if (any(!is.na(smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MF[1:40]))){ 
+  if (any(!is.na(smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MF[1:40])&!is.infinite(smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MF[1:40]))) {
+    NC_MFpc<-smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MF[1:40]
+    # convert Infs to Nans, so that they can be removed in the mean function with na.rm
+    NC_MFpc[is.infinite(NC_MFpc)]<-NaN
+    NC_MFpc[which(is.nan(NC_MFpc))]<-mean(NC_MFpc,na.rm = TRUE)
+    smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]<-smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]*mean(NC_MFpc)/NC_MFpc*sum(smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40])/sum(smop_hiMF_RFA[[3]][[i]]$NC_MF[1:40]*mean(NC_MFpc)/NC_MFpc) }
+  
+  # if (any(!is.na(smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MH[1:40]))){ 
+  if (any(!is.na(smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MH[1:40])&!is.infinite(smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MH[1:40]))) {
+    NC_MHpc<-smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]/smop_hiMF_RFA[[3]][[i]]$Con_MH[1:40]
+    # convert Infs to Nans, so that they can be removed in the mean function with na.rm
+    NC_MHpc[is.infinite(NC_MHpc)]<-NaN
+    NC_MHpc[which(is.nan(NC_MHpc))]<-mean(NC_MHpc,na.rm = TRUE)
+    smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]<-smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]*mean(NC_MHpc)/NC_MHpc*sum(smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40])/sum(smop_hiMF_RFA[[3]][[i]]$NC_MH[1:40]*mean(NC_MHpc)/NC_MHpc) }
+  # sum up total inflows to stock
+  smop_hiMF_RFA[[3]][[i]]$Tot_NC<-smop_hiMF_RFA[[3]][[i]]$NC_SF+smop_hiMF_RFA[[3]][[i]]$NC_MF+smop_hiMF_RFA[[3]][[i]]$NC_MH
+  
+  # New construction floor area inflows
+  smop_hiMF_RFA[[3]][[i]]$NC_SF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_SF*c(rep(smop_hiMF_RFA$FA.SF.2020s[i],10),rep(smop_hiMF_RFA$FA.SF.2030s[i],10),rep(smop_hiMF_RFA$FA.SF.2040s[i],10),rep(smop_hiMF_RFA$FA.SF.2050s[i],11))
+  smop_hiMF_RFA[[3]][[i]]$NC_MF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MF*c(rep(smop_hiMF_RFA$FA.MF.2020s[i],10),rep(smop_hiMF_RFA$FA.MF.2030s[i],10),rep(smop_hiMF_RFA$FA.MF.2040s[i],10),rep(smop_hiMF_RFA$FA.MF.2050s[i],11))
+  smop_hiMF_RFA[[3]][[i]]$NC_MH_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MH*c(rep(smop_hiMF_RFA$FA.MH.2020s[i],10),rep(smop_hiMF_RFA$FA.MH.2030s[i],10),rep(smop_hiMF_RFA$FA.MH.2040s[i],10),rep(smop_hiMF_RFA$FA.MH.2050s[i],11))
+  smop_hiMF_RFA[[3]][[i]]$Tot_NC_m2<-smop_hiMF_RFA[[3]][[i]]$NC_SF_m2+smop_hiMF_RFA[[3]][[i]]$NC_MF_m2+smop_hiMF_RFA[[3]][[i]]$NC_MH_m2
+  # Demolition floor area outflows, using dem factors to convert stock losses to actual demolitions. Not currently calculating columns for total demolitions by type. but can sum up the groups of columns if needed to do so
+  smop_hiMF_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))+
+    rowSums(smop_hiMF_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))+
+    rowSums(smop_hiMF_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))+
+    rowSums(smop_hiMF_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Tot_Dem_m2<-smop_hiMF_RFA[[3]][[i]]$Dem_SF_m2+smop_hiMF_RFA[[3]][[i]]$Dem_MF_m2+smop_hiMF_RFA[[3]][[i]]$Dem_MH_m2
+  
+  # total occupied floor area stock by type,now using update RFA assumption on floor area of new housing
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_hiMF_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_hiMF_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_hiMF_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF+smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF+smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH
+  
+  smop_hiMF_RFA[[3]][[i]]$m2cap_SF<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF/smop_hiMF_RFA[[3]][[i]]$Pop_SF
+  smop_hiMF_RFA[[3]][[i]]$m2cap_MF<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF/smop_hiMF_RFA[[3]][[i]]$Pop_MF
+  smop_hiMF_RFA[[3]][[i]]$m2cap_MH<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH/smop_hiMF_RFA[[3]][[i]]$Pop_MH
+  smop_hiMF_RFA[[3]][[i]]$m2cap<-smop_hiMF_RFA[[3]][[i]]$Occ_m2/smop_hiMF_RFA[[3]][[i]]$Population
+}
+
+
 # overwrite providence FA for new MF MH in RFA, will need to fix otherwise by fixing more of the rows in Geom Floor Area which have small samples and unusual values
+# have now fixed this instead by ensuring RFA mean FA never exceed standard FA
 # smop_RFA_FA[2281,c(23,24,26,27,29,30,32,33)]<-rep(as.numeric(meanFA_tcc[2281,c(18,19)]),4)
 # smop_RFA<-smop_RFA_FA
 # # then run the function to define smop_RFA for row 2281 only
@@ -973,11 +1247,15 @@ smop_hiDR_FA<-smop_hiDR
 smop_hiMF_FA<-smop_hiMF
 smop_hiDRMF_FA<-smop_hiDRMF
 smop_RFA_FA<-smop_RFA
+smop_hiDR_RFA_FA<-smop_hiDR_RFA
+smop_hiMF_RFA_FA<-smop_hiMF_RFA
 save(smop_base_FA,smop_hiDR_FA,smop_hiMF_FA,smop_hiDRMF_FA,smop_RFA_FA,file="HSM_results/County_FloorArea.RData") 
-# save(smop_base_FA,smop_hiDR_FA,smop_hiMF_FA,smop_hiDRMF_FA,smop_RFA_FA,file="HSM_results/County_FloorArea.RData")
+save(smop_base_FA,smop_hiDR_FA,smop_hiMF_FA,smop_RFA_FA,smop_hiDR_RFA_FA,smop_hiMF_RFA_FA,file="../resstock_projections/ExtData/County_FloorArea.RData")
 load("HSM_results/County_FloorArea.RData")
-# load in materian and ghg intensity data for house types, will likely be updated
+
+# load in materian and ghg intensity data for house types, pick up here when these data are updated ##########
 MGI<-read.csv("Data/mat_GHG_int.csv")
+load("Material_Intensities/Arch_intensities.RData")
 # remove metadata
 MGI<-MGI[,1:6]
 names(MGI)<-c("Year","Material","Type","MI_kg.m2","GI_kg.kg","GI_kg.m2")
