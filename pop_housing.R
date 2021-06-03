@@ -5,6 +5,8 @@ cat("\014") # clear console
 # make sure plyr is not loaded
 library(dplyr)
 library(tidyr)
+library(ggplot2)
+library(RColorBrewer)
 setwd("C:/Users/pb637/Documents/Yale Courses/Research/Final Paper/HSM_github")
 load('~/Yale Courses/Research/US Housing/Popn Survey/2017 USCB Pop Projections/Hauer files/SSP_asrc/Hauer.RData') # Hauer data, based on 'SSP_asrc.csv' file, accessible at https://osf.io/uh5sj/
 
@@ -26,6 +28,29 @@ cblp<-cbl[c(seq(5,45,5)),] # census bureau population projections for same years
 # actual US population in Jul1 2020 is ~ 329.5 million, close to the USCB low immigration scenario of 330.6, lower than the midrange scenario of 332.6, and lower than the Hauer SSP projections
 # SSP1 and SSP2 2020 valuer are 336.7, 335.7. Also lower than the ssp3 ssp4 values of 333.6 and 328.8.
 # The  Hauer-SSP scenarios most comparable to USCB projections are Hauer ssp2 for USCB mid range, and Hauer ssp4 for USCB low immigration.
+s1<-data.frame(Year=cbp$YEAR,Pop= ssp1[1:9],Projection="SSP1")
+s2<-data.frame(Year=cbp$YEAR,Pop= ssp2[1:9],Projection="SSP2")
+s4<-data.frame(Year=cbp$YEAR,Pop= ssp4[1:9],Projection="SSP4")
+cm<-data.frame(Year=cbp$YEAR,Pop=cbp$TOTAL_POP,Projection="USCB-mid")
+cl<-data.frame(Year=cblp$YEAR,Pop=cblp$TOTAL_POP,Projection="USCB-low")
+pp<-rbind(s1,s2,s4,cm,cl)
+
+cb$Growth<-0
+for(i in 2:45) {cb$Growth[i]<-cb$TOTAL_POP[i]-cb$TOTAL_POP[i-1]}
+cb$Growth[1]<-NA
+cb$delG<-0
+for(i in 3:45) {cb$delG[i]<-cb$Growth[i]-cb$Growth[i-1]}
+windows()
+ggplot(pp,aes(Year,1e-6*Pop,shape=Projection)) + geom_line(aes(col=Projection)) + geom_point(aes(col=Projection),size=2) + #ylim(320,440) +
+  theme_bw() + scale_shape_manual(values=c(19,19,19,5,5)) + scale_color_brewer(palette = "Dark2") + 
+  labs(title = "(a) US Population Projections", y = "Population (mill)") +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=11,face = "bold"),plot.title = element_text(size = 12, face = "bold"),legend.text=element_text(size=11))
+
+windows()
+ggplot(cb,aes(YEAR,1e-6*Growth)) + geom_line(col=brewer.pal(n = 5, name = "Dark2")[5],size=1) + theme_bw() + ylim(1,2.5) + xlim(2020,2060) +
+  labs(title = "(b) Annual Population Growth, USCB Mid-Range", y = "Population (mill)",x="Year") +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=11,face = "bold"),plot.title = element_text(size = 12, face = "bold"),legend.text=element_text(size=11))
+
 
 ######### household population by house type, from ACS Table B25033 ############### downloaded from data.census.gov
 # 5-year estimate, contains data for all counties in US and Puerto Rico

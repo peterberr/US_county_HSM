@@ -63,12 +63,12 @@ names(tcs_table)<-c("State","Vintage ACS","Type3","count")
 bsRFA$Type3<-"SF"
 bsRFA[bsRFA$Geometry.Building.Type.RECS %in% c("Multi-Family with 2 - 4 Units","Multi-Family with 5+ Units"),]$Type3<-"MF"
 bsRFA[bsRFA$Geometry.Building.Type.RECS == "Mobile Home",]$Type3<-"MH"
-tcc_tableRFA<-as.data.frame(table(bsRFA$County,bsRFA$Vintage.ACS,bsRFA$Type3))
-names(tcc_tableRFA)<-c("County","Vintage ACS","Type3","count")
-tcd_tableRFA<-as.data.frame(table(bsRFA$Census.Division,bsRFA$Vintage.ACS,bsRFA$Type3))
-names(tcd_tableRFA)<-c("Census.Division","Vintage ACS","Type3","count")
-tcs_tableRFA<-as.data.frame(table(bsRFA$State,bsRFA$Vintage.ACS,bsRFA$Type3))
-names(tcs_tableRFA)<-c("State","Vintage ACS","Type3","count")
+tcc_tableRFA<-as.data.frame(table(bsRFA$County,bsRFA$Type3))
+names(tcc_tableRFA)<-c("County","Type3","count")
+tcd_tableRFA<-as.data.frame(table(bsRFA$Census.Division,bsRFA$Type3))
+names(tcd_tableRFA)<-c("Census.Division","Type3","count")
+tcs_tableRFA<-as.data.frame(table(bsRFA$State,bsRFA$Type3))
+names(tcs_tableRFA)<-c("State","Type3","count")
 
 # add floor area estiamtes to each bs row, based on details in options_lookup #######
 bs2020$Floor.Area.m2<-0
@@ -154,15 +154,6 @@ bsRFA[bsRFA$Geometry.Floor.Area=="2500-2999"&bsRFA$Geometry.Building.Type.RECS %
 bsRFA[bsRFA$Geometry.Floor.Area=="2500-2999"&bsRFA$Geometry.Building.Type.RECS == "Single-Family Attached",]$Floor.Area.m2<-round(2631/10.765,1)
 bsRFA[bsRFA$Geometry.Floor.Area=="2500-2999"&bsRFA$Type3=="MF",]$Floor.Area.m2<-round(2590/10.765,1)
 # 
-# bsRFA[bsRFA$Geometry.Floor.Area=="3000-3999"&bsRFA$Geometry.Building.Type.RECS %in% c("Single-Family Detached","Mobile Home"),]$Floor.Area.m2<-round(3301/10.765,1)
-# bsRFA[bsRFA$Geometry.Floor.Area=="3000-3999"&bsRFA$Geometry.Building.Type.RECS == "Single-Family Attached",]$Floor.Area.m2<-round(3241/10.765,1)
-# bsRFA[bsRFA$Geometry.Floor.Area=="3000-3999"&bsRFA$Type3=="MF",]$Floor.Area.m2<-round(3138/10.765,1)
-# # 4000+. Using my own estimates here, consistent with my changes to options_lookup, but creating different value for MH
-# bsRFA[bsRFA$Geometry.Floor.Area=="4000+"&bsRFA$Geometry.Building.Type.RECS %in% c("Single-Family Detached"),]$Floor.Area.m2<-round(7500/10.765,1)
-# bsRFA[bsRFA$Geometry.Floor.Area=="4000+"&bsRFA$Geometry.Building.Type.RECS %in% c("Mobile Home"),]$Floor.Area.m2<-round(4200/10.765,1)
-# bsRFA[bsRFA$Geometry.Floor.Area=="4000+"&bsRFA$Geometry.Building.Type.RECS == "Single-Family Attached",]$Floor.Area.m2<-round(7000/10.765,1)
-# bsRFA[bsRFA$Geometry.Floor.Area=="4000+"&bsRFA$Type3=="MF",]$Floor.Area.m2<-round(7000/10.765,1)
-
 # calculate mean floor area by type, cohort, and geography #######
 # type and cohort, nationally
 tapply(bs2020$Floor.Area.m2, list(bs2020$Type3,bs2020$Vintage), mean)
@@ -194,6 +185,12 @@ mFA_all$Characteristics<-"Base"
 mFA_all[mFA_all$Scenario=="5. Red. FA",]$Characteristics<-"Reduced FA"
 windows()
 ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Characteristics),size=1)+geom_point(aes(color=Type),size=2) + 
+  labs(title = "Mean floor area of house types by cohort", y = "Mean Floor Area (m2)") + theme_bw() + ylim(c(10,260)) +
+  theme(axis.text=element_text(size=12),axis.title=element_text(size=14,face = "bold"),plot.title = element_text(size = 15, face = "bold"), 
+        legend.title=element_text(size=12), legend.text=element_text(size=11))
+mFA_all[mFA_all$Scenario=="5. Red. FA",]$Scenario<-"5-6"
+windows()
+ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Scenario),size=1)+geom_point(aes(color=Type),size=2) + 
   labs(title = "Mean floor area of house types by cohort", y = "Mean Floor Area (m2)") + theme_bw() + ylim(c(10,260)) +
   theme(axis.text=element_text(size=12),axis.title=element_text(size=14,face = "bold"),plot.title = element_text(size = 15, face = "bold"), 
         legend.title=element_text(size=12), legend.text=element_text(size=11))
@@ -272,20 +269,20 @@ for (k in 3:20) {
 # mFA by geograpy, RFA #####
 
 # mean floor area by type, cohort, and region
-meanFA_tcr_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$Census.Region,bsRFA$Type3,bsRFA$Vintage.ACS), mean)),2)
-meanFA_tr_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$Census.Region,bsRFA$Type3), mean)),2)
+# meanFA_tcr_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$Census.Region,bsRFA$Type3,bsRFA$Vintage.ACS), mean)),2)
+meanFA_tcr_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$Census.Region,bsRFA$Type3), mean)),2)
 
 meanFA_tcr_RFA$Region<-rownames(meanFA_tcr_RFA)
 rownames(meanFA_tcr_RFA)<-1:nrow(meanFA_tcr_RFA)
-meanFA_tcr_RFA<-meanFA_tcr_RFA[,c(13,1:12)]
+meanFA_tcr_RFA<-meanFA_tr_RFA[,c(4,1:3)]
 # type, cohort, and division
-meanFA_tcd_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$Census.Division,bsRFA$Type3,bsRFA$Vintage.ACS), mean)),2)
+meanFA_tcd_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$Census.Division,bsRFA$Type3), mean)),2)
 meanFA_tcd_RFA$Census.Division<-rownames(meanFA_tcd_RFA)
 rownames(meanFA_tcd_RFA)<-1:nrow(meanFA_tcd_RFA)
 DivReg<-unique(bsRFA[,c("Census.Division","Census.Region")])
 meanFA_tcd_RFA<-merge(meanFA_tcd_RFA,DivReg)
-tcd_RFAs<-tcd_tableRFA[tcd_tableRFA$count<5,] # which tcd_RFA combos have a small # of observations?
-# only needs done if tcd_RFAs was > 0
+tcd_RFAs<-tcd_tableRFA[tcd_tableRFA$count<5,] # which td_RFA combos have a small # of observations?
+# only needs done if td_RFAs was > 0
 # for (j in 1:nrow(tcd_RFAs)) {
 #   meanFA_tcd_RFA[meanFA_tcd_RFA$Census.Division==tcd_RFAs$Census.Division[j], paste(tcd_RFAs$Type3[j],tcd_RFAs$`Vintage ACS`[j],sep = ".")]<-NA
 # }
@@ -299,17 +296,17 @@ tcd_RFAs<-tcd_tableRFA[tcd_tableRFA$count<5,] # which tcd_RFA combos have a smal
 #   }
 # }
 # type, cohort, and state
-meanFA_tcs_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$State,bsRFA$Type3,bsRFA$Vintage.ACS), mean)),2)
+meanFA_tcs_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$State,bsRFA$Type3), mean)),2)
 meanFA_tcs_RFA$State<-rownames(meanFA_tcs_RFA)
 rownames(meanFA_tcs_RFA)<-1:nrow(meanFA_tcs_RFA)
-meanFA_tcs_RFA<-meanFA_tcs_RFA[,c(13,1:12)]
+meanFA_tcs_RFA<-meanFA_tcs_RFA[,c(4,1:3)]
 meanFA_tcs_RFA<-merge(meanFA_tcs_RFA,StDiv)
 tcs_RFAs<-tcs_tableRFA[tcs_tableRFA$count<5,] # which tcs_RFA combos have a small # of observations?
 for (j in 1:nrow(tcs_RFAs)) {
-  meanFA_tcs_RFA[meanFA_tcs_RFA$State==tcs_RFAs$State[j], paste(tcs_RFAs$Type3[j],tcs_RFAs$`Vintage ACS`[j],sep = ".")]<-NA
+  meanFA_tcs_RFA[meanFA_tcs_RFA$State==tcs_RFAs$State[j], paste(tcs_RFAs$Type3[j],sep = ".")]<-NA
 }
 # fill in blanks based on division average
-for (k in 2:13) { 
+for (k in 2:4) { 
   for (r in 1:49) {
     if (is.na(meanFA_tcs_RFA[r,k])) {
       meanFA_tcs_RFA[r,k]<-round(meanFA_tcd_RFA[meanFA_tcd_RFA$Census.Division==meanFA_tcs_RFA[r,"Census.Division"],k],2)
@@ -318,21 +315,21 @@ for (k in 2:13) {
 }
 
 # type, cohort, and county
-meanFA_tcc_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$County,bsRFA$Type3,bsRFA$Vintage.ACS), mean)),2)
+meanFA_tcc_RFA<-round(as.data.frame(tapply(bsRFA$Floor.Area.m2, list(bsRFA$County,bsRFA$Type3), mean)),2)
 meanFA_tcc_RFA$RS_ID<-rownames(meanFA_tcc_RFA)
 rownames(meanFA_tcc_RFA)<-1:nrow(meanFA_tcc_RFA)
 meanFA_tcc_RFA<-merge(meanFA_tcc_RFA,ctycode,all = TRUE)
-meanFA_tcc_RFA<-meanFA_tcc_RFA[,c(14,1:13)]
+meanFA_tcc_RFA<-meanFA_tcc_RFA[,c(5,1:4)]
 meanFA_tcc_RFA<-meanFA_tcc_RFA[order(meanFA_tcc_RFA$GeoID),]
 meanFA_tcc_RFA<-meanFA_tcc_RFA[-c(which(substr(meanFA_tcc_RFA$GeoID,1,2) %in% c("02","15"))),] # remove AK, HI
 tcc_RFAs<-tcc_tableRFA[tcc_tableRFA$count<5,] # which tcc_RFA combos have a small # of observations?
 for (j in 1:nrow(tcc_RFAs)) {
-  meanFA_tcc_RFA[meanFA_tcc_RFA$RS_ID==tcc_RFAs$County[j], paste(tcc_RFAs$Type3[j],tcc_RFAs$`Vintage ACS`[j],sep = ".")]<-NA
+  meanFA_tcc_RFA[meanFA_tcc_RFA$RS_ID==tcc_RFAs$County[j], paste(tcc_RFAs$Type3[j],sep = ".")]<-NA
 }
 
 meanFA_tcc_RFA$State<-substr(meanFA_tcc_RFA$RS_ID,1,2)
 # fill in blanks based on state average
-for (k in 3:14) { 
+for (k in 3:5) { 
   for (r in 1:3108) {
     if (is.na(meanFA_tcc_RFA[r,k])) {
       meanFA_tcc_RFA[r,k]<-round(meanFA_tcs_RFA[meanFA_tcs_RFA$State==meanFA_tcc_RFA[r,"State"],k-1],2)
@@ -343,41 +340,14 @@ for (k in 3:14) {
 # alter meanFA dfs so that the RFA version never has larger floor areas than the regular version. THIS IS CRUCIAL
 # needs to be done for every future cohort
 for (j in 1:3108) { 
-  if (meanFA_tcc_RFA$MF.2020s[j]>meanFA_tcc$MF.2010s[j]) {
-    meanFA_tcc_RFA$MF.2020s[j]<-meanFA_tcc$MF.2010s[j]
+  if (meanFA_tcc_RFA$MF[j]>meanFA_tcc$MF.2010s[j]) {
+    meanFA_tcc_RFA$MF[j]<-meanFA_tcc$MF.2010s[j]
   }
-  if (meanFA_tcc_RFA$SF.2020s[j]>meanFA_tcc$SF.2010s[j]) {
-    meanFA_tcc_RFA$SF.2020s[j]<-meanFA_tcc$SF.2010s[j]
+  if (meanFA_tcc_RFA$SF[j]>meanFA_tcc$SF.2010s[j]) {
+    meanFA_tcc_RFA$SF[j]<-meanFA_tcc$SF.2010s[j]
   }
-  if (meanFA_tcc_RFA$MH.2020s[j]>meanFA_tcc$MH.2010s[j]) {
-    meanFA_tcc_RFA$MH.2020s[j]<-meanFA_tcc$MH.2010s[j]
-  }
-  if (meanFA_tcc_RFA$MF.2030s[j]>meanFA_tcc$MF.2010s[j]) {
-    meanFA_tcc_RFA$MF.2030s[j]<-meanFA_tcc$MF.2010s[j]
-  }
-  if (meanFA_tcc_RFA$SF.2030s[j]>meanFA_tcc$SF.2010s[j]) {
-    meanFA_tcc_RFA$SF.2030s[j]<-meanFA_tcc$SF.2010s[j]
-  }
-  if (meanFA_tcc_RFA$MH.2030s[j]>meanFA_tcc$MH.2010s[j]) {
-    meanFA_tcc_RFA$MH.2030s[j]<-meanFA_tcc$MH.2010s[j]
-  }
-  if (meanFA_tcc_RFA$MF.2040s[j]>meanFA_tcc$MF.2010s[j]) {
-    meanFA_tcc_RFA$MF.2040s[j]<-meanFA_tcc$MF.2010s[j]
-  }
-  if (meanFA_tcc_RFA$SF.2040s[j]>meanFA_tcc$SF.2010s[j]) {
-    meanFA_tcc_RFA$SF.2040s[j]<-meanFA_tcc$SF.2010s[j]
-  }
-  if (meanFA_tcc_RFA$MH.2040s[j]>meanFA_tcc$MH.2010s[j]) {
-    meanFA_tcc_RFA$MH.2040s[j]<-meanFA_tcc$MH.2010s[j]
-  }
-  if (meanFA_tcc_RFA$MF.2050s[j]>meanFA_tcc$MF.2010s[j]) {
-    meanFA_tcc_RFA$MF.2050s[j]<-meanFA_tcc$MF.2010s[j]
-  }
-  if (meanFA_tcc_RFA$SF.2050s[j]>meanFA_tcc$SF.2010s[j]) {
-    meanFA_tcc_RFA$SF.2050s[j]<-meanFA_tcc$SF.2010s[j]
-  }
-  if (meanFA_tcc_RFA$MH.2050s[j]>meanFA_tcc$MH.2010s[j]) {
-    meanFA_tcc_RFA$MH.2050s[j]<-meanFA_tcc$MH.2010s[j]
+  if (meanFA_tcc_RFA$MH[j]>meanFA_tcc$MH.2010s[j]) {
+    meanFA_tcc_RFA$MH[j]<-meanFA_tcc$MH.2010s[j]
   }
 }
 
@@ -385,7 +355,7 @@ for (j in 1:3108) {
 load("HSM_results/County_Scenario_SM_Results.RData") # 
 SF_dem_factor<-0.35 # how much of SF homes leaving the stock are actually demolished right away?
 MF_dem_factor<-0.2 # how much of MF homes leaving the stock are actually demolished right away?
-MH_dem_factor<-0.45 # how much of MH homes leaving the stock are actually demolished right away? This was changed from 0.5 to 0.45?
+MH_dem_factor<-0.45 # how much of MH homes leaving the stock are actually demolished right away? This was changed from 0.5 to 0.45
 # add the resstock county ID's
 smb<-smop_base
 smop_base<-merge(smop_base,ctycode)
@@ -419,9 +389,10 @@ smop_hiDR_RFA[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
 smop_hiMF_RFA[,paste("FA",names(meanFA_tcc)[3:20],sep=".")]<-meanFA_tcc[,3:20]
 
 # define different floor areas for new construction in the RFA scenarios
-smop_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
-smop_hiDR_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
-smop_hiMF_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:14],sep=".")]<-meanFA_tcc_RFA[,3:14]
+names(meanFA_tcc_RFA)[3:5]<-paste(names(meanFA_tcc_RFA)[3:5],'NC',sep='.')
+smop_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:5],sep=".")]<-meanFA_tcc_RFA[,3:5]
+smop_hiDR_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:5],sep=".")]<-meanFA_tcc_RFA[,3:5]
+smop_hiMF_RFA[,paste("FA",names(meanFA_tcc_RFA)[3:5],sep=".")]<-meanFA_tcc_RFA[,3:5]
 
 # now calculate m2/cap per house type in each county for each scenario ###########
 # base
@@ -1000,23 +971,23 @@ for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. 
   smop_RFA[[3]][[i]]$Tot_NC<-smop_RFA[[3]][[i]]$NC_SF+smop_RFA[[3]][[i]]$NC_MF+smop_RFA[[3]][[i]]$NC_MH
   
   # New construction floor area inflows
-  smop_RFA[[3]][[i]]$NC_SF_m2<-smop_RFA[[3]][[i]]$NC_SF*c(rep(smop_RFA$FA.SF.2020s[i],10),rep(smop_RFA$FA.SF.2030s[i],10),rep(smop_RFA$FA.SF.2040s[i],10),rep(smop_RFA$FA.SF.2050s[i],11))
-  smop_RFA[[3]][[i]]$NC_MF_m2<-smop_RFA[[3]][[i]]$NC_MF*c(rep(smop_RFA$FA.MF.2020s[i],10),rep(smop_RFA$FA.MF.2030s[i],10),rep(smop_RFA$FA.MF.2040s[i],10),rep(smop_RFA$FA.MF.2050s[i],11))
-  smop_RFA[[3]][[i]]$NC_MH_m2<-smop_RFA[[3]][[i]]$NC_MH*c(rep(smop_RFA$FA.MH.2020s[i],10),rep(smop_RFA$FA.MH.2030s[i],10),rep(smop_RFA$FA.MH.2040s[i],10),rep(smop_RFA$FA.MH.2050s[i],11))
+  smop_RFA[[3]][[i]]$NC_SF_m2<-smop_RFA[[3]][[i]]$NC_SF*smop_RFA$FA.SF.NC[i]
+  smop_RFA[[3]][[i]]$NC_MF_m2<-smop_RFA[[3]][[i]]$NC_MF*smop_RFA$FA.MF.NC[i]
+  smop_RFA[[3]][[i]]$NC_MH_m2<-smop_RFA[[3]][[i]]$NC_MH*smop_RFA$FA.MH.NC[i]
   smop_RFA[[3]][[i]]$Tot_NC_m2<-smop_RFA[[3]][[i]]$NC_SF_m2+smop_RFA[[3]][[i]]$NC_MF_m2+smop_RFA[[3]][[i]]$NC_MH_m2
   # Demolition floor area outflows, using dem factors to convert stock losses to actual demolitions. Not currently calculating columns for total demolitions by type. but can sum up the groups of columns if needed to do so
-  smop_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))+
-    rowSums(smop_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
-  smop_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))+
-    rowSums(smop_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
-  smop_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))+
-    rowSums(smop_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))+
+    rowSums(smop_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))
+  smop_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))+
+    rowSums(smop_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))
+  smop_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))+
+    rowSums(smop_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))
   smop_RFA[[3]][[i]]$Tot_Dem_m2<-smop_RFA[[3]][[i]]$Dem_SF_m2+smop_RFA[[3]][[i]]$Dem_MF_m2+smop_RFA[[3]][[i]]$Dem_MH_m2
   
   # total occupied floor area stock by type,now using update RFA assumption on floor area of new housing
-  smop_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
-  smop_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
-  smop_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))
+  smop_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))
+  smop_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))
   smop_RFA[[3]][[i]]$Occ_m2<-smop_RFA[[3]][[i]]$Occ_m2_SF+smop_RFA[[3]][[i]]$Occ_m2_MF+smop_RFA[[3]][[i]]$Occ_m2_MH
   
   smop_RFA[[3]][[i]]$m2cap_SF<-smop_RFA[[3]][[i]]$Occ_m2_SF/smop_RFA[[3]][[i]]$Pop_SF
@@ -1120,23 +1091,23 @@ for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. 
   smop_hiDR_RFA[[3]][[i]]$Tot_NC<-smop_hiDR_RFA[[3]][[i]]$NC_SF+smop_hiDR_RFA[[3]][[i]]$NC_MF+smop_hiDR_RFA[[3]][[i]]$NC_MH
   
   # New construction floor area inflows
-  smop_hiDR_RFA[[3]][[i]]$NC_SF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_SF*c(rep(smop_hiDR_RFA$FA.SF.2020s[i],10),rep(smop_hiDR_RFA$FA.SF.2030s[i],10),rep(smop_hiDR_RFA$FA.SF.2040s[i],10),rep(smop_hiDR_RFA$FA.SF.2050s[i],11))
-  smop_hiDR_RFA[[3]][[i]]$NC_MF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MF*c(rep(smop_hiDR_RFA$FA.MF.2020s[i],10),rep(smop_hiDR_RFA$FA.MF.2030s[i],10),rep(smop_hiDR_RFA$FA.MF.2040s[i],10),rep(smop_hiDR_RFA$FA.MF.2050s[i],11))
-  smop_hiDR_RFA[[3]][[i]]$NC_MH_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MH*c(rep(smop_hiDR_RFA$FA.MH.2020s[i],10),rep(smop_hiDR_RFA$FA.MH.2030s[i],10),rep(smop_hiDR_RFA$FA.MH.2040s[i],10),rep(smop_hiDR_RFA$FA.MH.2050s[i],11))
+  smop_hiDR_RFA[[3]][[i]]$NC_SF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_SF*smop_hiDR_RFA$FA.SF.NC[i]
+  smop_hiDR_RFA[[3]][[i]]$NC_MF_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MF*smop_hiDR_RFA$FA.MF.NC[i]
+  smop_hiDR_RFA[[3]][[i]]$NC_MH_m2<-smop_hiDR_RFA[[3]][[i]]$NC_MH*smop_hiDR_RFA$FA.MH.NC[i]
   smop_hiDR_RFA[[3]][[i]]$Tot_NC_m2<-smop_hiDR_RFA[[3]][[i]]$NC_SF_m2+smop_hiDR_RFA[[3]][[i]]$NC_MF_m2+smop_hiDR_RFA[[3]][[i]]$NC_MH_m2
   # Demolition floor area outflows, using dem factors to convert stock losses to actual demolitions. Not currently calculating columns for total demolitions by type. but can sum up the groups of columns if needed to do so
-  smop_hiDR_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))+
-    rowSums(smop_hiDR_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
-  smop_hiDR_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))+
-    rowSums(smop_hiDR_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
-  smop_hiDR_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))+
-    rowSums(smop_hiDR_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))+
+    rowSums(smop_hiDR_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))+
+    rowSums(smop_hiDR_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_hiDR_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))+
+    rowSums(smop_hiDR_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))
   smop_hiDR_RFA[[3]][[i]]$Tot_Dem_m2<-smop_hiDR_RFA[[3]][[i]]$Dem_SF_m2+smop_hiDR_RFA[[3]][[i]]$Dem_MF_m2+smop_hiDR_RFA[[3]][[i]]$Dem_MH_m2
   
   # total occupied floor area stock by type,now using update RFA assumption on floor area of new housing
-  smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_hiDR_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
-  smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_hiDR_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
-  smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_hiDR_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_hiDR_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_hiDR_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))
+  smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_hiDR_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_hiDR_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))
   smop_hiDR_RFA[[3]][[i]]$Occ_m2<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF+smop_hiDR_RFA[[3]][[i]]$Occ_m2_MF+smop_hiDR_RFA[[3]][[i]]$Occ_m2_MH
   
   smop_hiDR_RFA[[3]][[i]]$m2cap_SF<-smop_hiDR_RFA[[3]][[i]]$Occ_m2_SF/smop_hiDR_RFA[[3]][[i]]$Pop_SF
@@ -1240,23 +1211,23 @@ for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. 
   smop_hiMF_RFA[[3]][[i]]$Tot_NC<-smop_hiMF_RFA[[3]][[i]]$NC_SF+smop_hiMF_RFA[[3]][[i]]$NC_MF+smop_hiMF_RFA[[3]][[i]]$NC_MH
   
   # New construction floor area inflows
-  smop_hiMF_RFA[[3]][[i]]$NC_SF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_SF*c(rep(smop_hiMF_RFA$FA.SF.2020s[i],10),rep(smop_hiMF_RFA$FA.SF.2030s[i],10),rep(smop_hiMF_RFA$FA.SF.2040s[i],10),rep(smop_hiMF_RFA$FA.SF.2050s[i],11))
-  smop_hiMF_RFA[[3]][[i]]$NC_MF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MF*c(rep(smop_hiMF_RFA$FA.MF.2020s[i],10),rep(smop_hiMF_RFA$FA.MF.2030s[i],10),rep(smop_hiMF_RFA$FA.MF.2040s[i],10),rep(smop_hiMF_RFA$FA.MF.2050s[i],11))
-  smop_hiMF_RFA[[3]][[i]]$NC_MH_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MH*c(rep(smop_hiMF_RFA$FA.MH.2020s[i],10),rep(smop_hiMF_RFA$FA.MH.2030s[i],10),rep(smop_hiMF_RFA$FA.MH.2040s[i],10),rep(smop_hiMF_RFA$FA.MH.2050s[i],11))
+  smop_hiMF_RFA[[3]][[i]]$NC_SF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_SF*smop_hiMF_RFA$FA.SF.NC[i]
+  smop_hiMF_RFA[[3]][[i]]$NC_MF_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MF*smop_hiDR_RFA$FA.MF.NC[i]
+  smop_hiMF_RFA[[3]][[i]]$NC_MH_m2<-smop_hiMF_RFA[[3]][[i]]$NC_MH*smop_hiDR_RFA$FA.MH.NC[i]
   smop_hiMF_RFA[[3]][[i]]$Tot_NC_m2<-smop_hiMF_RFA[[3]][[i]]$NC_SF_m2+smop_hiMF_RFA[[3]][[i]]$NC_MF_m2+smop_hiMF_RFA[[3]][[i]]$NC_MH_m2
   # Demolition floor area outflows, using dem factors to convert stock losses to actual demolitions. Not currently calculating columns for total demolitions by type. but can sum up the groups of columns if needed to do so
-  smop_hiMF_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))+
-    rowSums(smop_hiMF_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
-  smop_hiMF_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))+
-    rowSums(smop_hiMF_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
-  smop_hiMF_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))+
-    rowSums(smop_hiMF_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Dem_SF_m2<-SF_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,248:257]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))+
+    rowSums(smop_hiMF_RFA[[3]][[i]][,258:267]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Dem_MF_m2<-MF_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,268:277]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))+
+    rowSums(smop_hiMF_RFA[[3]][[i]][,278:287]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Dem_MH_m2<-MH_dem_factor*rowSums(smop_hiMF_RFA[[3]][[i]][,288:297]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))+
+    rowSums(smop_hiMF_RFA[[3]][[i]][,298:307]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))
   smop_hiMF_RFA[[3]][[i]]$Tot_Dem_m2<-smop_hiMF_RFA[[3]][[i]]$Dem_SF_m2+smop_hiMF_RFA[[3]][[i]]$Dem_MF_m2+smop_hiMF_RFA[[3]][[i]]$Dem_MH_m2
   
   # total occupied floor area stock by type,now using update RFA assumption on floor area of new housing
-  smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_hiMF_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,28,31,34)]),each=41),41,10))
-  smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_hiMF_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,26,29,32)]),each=41),41,10))
-  smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_hiMF_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,27,30,33)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF<-rowSums(smop_hiMF_RFA[[3]][[i]][,110:119]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(7,10,13,16,19,22,25,25,25,25)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF<-rowSums(smop_hiMF_RFA[[3]][[i]][,130:139]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(5,8,11,14,17,20,23,23,23,23)]),each=41),41,10))
+  smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH<-rowSums(smop_hiMF_RFA[[3]][[i]][,150:159]*matrix(rep(as.numeric(smop_hiMF_RFA[i,c(6,9,12,15,18,21,24,24,24,24)]),each=41),41,10))
   smop_hiMF_RFA[[3]][[i]]$Occ_m2<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF+smop_hiMF_RFA[[3]][[i]]$Occ_m2_MF+smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH
   
   smop_hiMF_RFA[[3]][[i]]$m2cap_SF<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_SF/smop_hiMF_RFA[[3]][[i]]$Pop_SF
@@ -1264,7 +1235,7 @@ for (i in c(1:3108)) { # these loops are slow, take about 4 seconds per county. 
   smop_hiMF_RFA[[3]][[i]]$m2cap_MH<-smop_hiMF_RFA[[3]][[i]]$Occ_m2_MH/smop_hiMF_RFA[[3]][[i]]$Pop_MH
   smop_hiMF_RFA[[3]][[i]]$m2cap<-smop_hiMF_RFA[[3]][[i]]$Occ_m2/smop_hiMF_RFA[[3]][[i]]$Population
 }
-save(smop_RFA,smop_hiDR_RFA,smop_hiMF_RFA,file="HSM_results/County_FloorArea_RFA.RData")
+# save(smop_RFA,smop_hiDR_RFA,smop_hiMF_RFA,file="HSM_results/County_FloorArea_RFA.RData")
 
 # overwrite providence FA for new MF MH in RFA, will need to fix otherwise by fixing more of the rows in Geom Floor Area which have small samples and unusual values
 # have now fixed this instead by ensuring RFA mean FA never exceed standard FA
@@ -1282,7 +1253,7 @@ smop_hiDR_RFA_FA<-smop_hiDR_RFA
 smop_hiMF_RFA_FA<-smop_hiMF_RFA
 save(smop_base_FA,smop_hiDR_FA,smop_hiMF_FA,smop_hiDRMF_FA,smop_RFA_FA,file="HSM_results/County_FloorArea.RData") 
 save(smop_base_FA,smop_hiDR_FA,smop_hiMF_FA,smop_RFA_FA,smop_hiDR_RFA_FA,smop_hiMF_RFA_FA,file="../resstock_projections/ExtData/County_FloorArea.RData")
-load("HSM_results/County_FloorArea.RData")
+# load("HSM_results/County_FloorArea.RData")
 
 # load in materian and ghg intensity data for house types, here on is redundant, and now done instead in mgInt_apply ##########
 MGI<-read.csv("Data/mat_GHG_int.csv")

@@ -514,11 +514,11 @@ ohu<-melt(df[,c(1,2,15:17)],id = c("GeoID","Year"))
 names(ohu)[3:4]<-c("Type","Occupied Units")
 location<-codes[codes$GeoID==as.numeric(ohu$GeoID[1]),]$County.State
 ohu$Type<-substr(ohu$Type,8,9)
-windows()
+# windows()
 ggplot(ohu,aes(x=Year,y=0.001*`Occupied Units`,group=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::comma) +
   labs(title = paste("Occupied housing units by type, 2020-2060,",location),subtitle = scenarios[scen], y = "Occupied Units (1,000 Units)") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-windows()
+# windows()
 ggplot(ohu,aes(x=Year,y=1e-6*`Occupied Units`,fill=Type)) + geom_col() +
   labs(title = paste("Occupied housing units by type, 2020-2060,",location),subtitle = scenarios[scen], y = "Million Housing Units") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
@@ -531,7 +531,7 @@ OHU[,3:5]<-OHU[,3:5]/rowSums(OHU[,3:5])
 ohus<-melt(OHU,id = c("GeoID","Year"))
 names(ohus)[3:4]<-c("Type","Occupied Units")
 ohus$Type<-substr(ohus$Type,8,9)
-windows()
+# windows()
 ggplot(ohus,aes(x=Year,y=`Occupied Units`,group=Type))+geom_line(aes(color=Type))+geom_point(aes(color=Type)) + scale_y_continuous(labels = scales::percent) +
   labs(title = paste("Occupied housing units by type, 2020-2060,",location ),subtitle = scenarios[scen]) + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
@@ -551,7 +551,7 @@ g<-ggplot(cd,aes(x=Year,y=0.001*value,group=Flow_Type))+geom_point(aes(color=Typ
   labs(title = paste("Stock additions and losses, 2020-2060,",location ),subtitle = scenarios[scen], y = "Stock additions and losses (1,000 Units/yr)") + theme_bw() + scale_shape_manual(values = c(16, 2)) + 
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
 assign(paste("condem_",scen_name[scen],sep = ""),g)
-g
+# g
 # ggsave(paste("ConDem_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 7,height = 5.5)
 # ggsave(paste("ConDem_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol,width = 5.7,height = 5.1)
 
@@ -566,6 +566,14 @@ g<-ggplot(vr,aes(x=Year,y=`Vacancy Ratio`,group=Type))+geom_point(aes(color=Type
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
 # g
 # ggsave(paste("VacRat_US_", scen_name[scen],  ".jpeg",sep=""),g,path = fol)
+
+
+# vacancy rates 2
+# windows()
+g<-ggplot(vr,aes(x=Year,y=100*((`Vacancy Ratio`-1)/`Vacancy Ratio`),group=Type))+geom_point(aes(color=Type),size=2) + ylim(10,21.6) +
+  labs(title = paste("Vacancy Factor by house type, 2020-2060,",location),subtitle = scenarios[scen], y = "Vacancy Rate (%)") + theme_bw() +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
+assign(paste("vr_",scen_name[scen],sep = ""),g)
 
 # construction and demolition rates
 cdr<-melt(df[,c(1,2,93:98)],id = c("GeoID","Year"))
@@ -632,6 +640,14 @@ condem_hiMF+theme(legend.position = "none")
 condem_hiDRMF+theme(legend.position = "none")
 
 condem_base+theme(legend.position = "none")+labs(title = paste("Stock additions and losses, 2020-2060,",location ),subtitle = "1. Baseline;  5. Reduced Floor Area", y = "Stock additions and losses (1,000 Units/yr)")
+condem_hiMF+theme(legend.position = "none")+labs(title = paste("Stock additions and losses, 2020-2060,",location ),subtitle = "3. High Multifamily;  6. High Multifamily, Red. Floor Area", y = "Stock additions and losses (1,000 Units/yr)")
+
+# adjusted legend vacancy rate plots
+windows(width = 5.2, height = 5.1)
+vr_base+theme(legend.position = "none")+labs(title = paste("Vacancy Rate by house type, 2020-2060,",location ),subtitle = "1. Baseline;  5. Reduced Floor Area", y = "Vacancy Rate (%)")# + ylim(8,22)
+vr_hiDR+theme(legend.position = "none")#+ ylim(8,22)
+vr_hiMF+theme(legend.position = "none")+theme(legend.position = "none")+labs(title = paste("Vacancy Rate by house type, 2020-2060,",location ),subtitle = "3. High Multifamily;  6. High Multifamily, Red. Floor Area", y = "Vacancy Rate (%)")
+vr_hiDRMF+theme(legend.position = "none")
 
 # plots for manuscript Fig 4
 windows(width = 6.415, height = 5.415)
@@ -743,18 +759,44 @@ cd<-cd[cd$Year<2060,]
 g<-ggplot(cd,aes(x=Year,y=value,group=Flow_Type))+geom_point(aes(color=Type, shape=Flow),size=2) + scale_y_continuous(labels = scales::comma) +
   labs(title = paste("Construction and demolition, 2020-2060,",location ),subtitle = scenarios[scen], y = "Annual construction and demolition") + theme_bw() + scale_shape_manual(values = c(16, 2)) + 
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("ConDem", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
+# ggsave(paste("ConDem", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 
 # vacancy rates
 vr<-melt(df[,c(1,2,18:21)],id = c("GeoID","Year"))
 names(vr)[3:4]<-c("Type","Vacancy Ratio")
 vr$Type<-substr(vr$Type,4,nchar(as.character(vr$Type)))
 vr<-vr[!vr$Type=="Tot",]
-g<-ggplot(vr,aes(x=Year,y=(`Vacancy Ratio`-1)/`Vacancy Ratio`,group=Type))+geom_point(aes(color=Type),size=2) + scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  labs(title = paste("Vacancy Rate by house type, 2020-2060,",location),subtitle = scenarios[scen], y = "Vacancy Rate") + theme_bw() +
+vr$Rate<-'Observed'
+vr2<-vr
+vr2$Rate<-'Natural'
+if(vr2$GeoID[1]=='35045') {vr2[vr2$Type=="SF",]$`Vacancy Ratio`<-1.0897; #San Juan, in West
+                          vr2[vr2$Type=="MF",]$`Vacancy Ratio`<-1.1314;
+                          vr2[vr2$Type=="MH",]$`Vacancy Ratio`<-1.2184}
+
+if(vr2$GeoID[1]=='44007') {vr2[vr2$Type=="SF",]$`Vacancy Ratio`<-1.1032; #Providence, in NorthEast
+vr2[vr2$Type=="MF",]$`Vacancy Ratio`<-1.1184;
+vr2[vr2$Type=="MH",]$`Vacancy Ratio`<-1.1809}
+
+if(vr2$GeoID[1]=='26103') {vr2[vr2$Type=="SF",]$`Vacancy Ratio`<-1.0911; # Marquette, in MidWest
+vr2[vr2$Type=="MF",]$`Vacancy Ratio`<-1.1759;
+vr2[vr2$Type=="MH",]$`Vacancy Ratio`<-1.2519}
+
+if(vr2$GeoID[1]=='48201') {vr2[vr2$Type=="SF",]$`Vacancy Ratio`<-1.1114; # Harris, in South
+vr2[vr2$Type=="MF",]$`Vacancy Ratio`<-1.23;
+vr2[vr2$Type=="MH",]$`Vacancy Ratio`<-1.275}
+
+
+vr3<-rbind(vr,vr2)
+
+g<-ggplot(vr3,aes(x=Year,y=(`Vacancy Ratio`-1)/`Vacancy Ratio`,group=Type))+geom_point(aes(color=Type,shape=Rate),size=2) + scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(title = paste("Vacancy Rate by house type, 2020-2060,",location),subtitle = scenarios[scen], y = "Vacancy Rate") + theme_bw() + scale_shape_manual(values=c(4,19)) +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("VacRate", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
+# ggsave(paste("VacRate", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 assign(paste("VacRate", as.character(cty), "_", scen_name[scen],sep=""),g)
+
+ggplot(vr3,aes(x=Year,y=(`Vacancy Ratio`-1)/`Vacancy Ratio`,group=Type))+geom_point(aes(color=Type,shape=Rate),size=2) + scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(title = paste("Vacancy Rate by house type, 2020-2060,",location),subtitle = scenarios[scen], y = "Vacancy Rate") + theme_bw() + scale_shape_manual(values=c(4,19)) +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 
 # construction and demolition rates
 cdr<-melt(df[,c(1,2,32:37)],id = c("GeoID","Year"))
@@ -768,7 +810,7 @@ cdr<-cdr[cdr$Year<2060,]
 g<-ggplot(cdr,aes(x=Year,y=value,group=Flow_Type))+geom_point(aes(color=Type, shape=Flow),size=2)  + scale_y_continuous(labels = scales::percent) +
   labs(title = paste("Stock Addition and Loss Rates,",location ),subtitle = scenarios[scen], y = "Add, Loss Rate") + theme_bw() + scale_shape_manual(values = c(16, 2)) +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-ggsave(paste("ConDemRate", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
+# ggsave(paste("ConDemRate", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 assign(paste("ConDemRate", as.character(cty), "_", scen_name[scen],sep=""),g)
 
 # housing stock by cohort (area chart) for each house type
@@ -784,7 +826,7 @@ tc_sf$order<-rep(rev(c(1:10)),each=41)
 g<-ggplot(tc_sf,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area() + scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = paste("Total Single-Family Units by Cohort,",location ),subtitle = scenarios[scen], y = "Total SF Stock (1,000 Units)",fill="Cohort") + theme_bw() + scale_fill_brewer(palette="Paired")+
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-ggsave(paste("SF_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
+# ggsave(paste("SF_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 
 tc_mf<-tc[tc$Type=="MF",]
 tc_mf$order<-rep(rev(c(1:10)),each=41)
@@ -792,7 +834,7 @@ tc_mf$order<-rep(rev(c(1:10)),each=41)
 g<-ggplot(tc_mf,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area() + scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = paste("Total Multifamily Units by Cohort,",location ),subtitle = scenarios[scen],y = "Total MF Stock (1,000 Units)",fill="Cohort") + theme_bw() + scale_fill_brewer(palette="Paired")+
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("MF_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
+# ggsave(paste("MF_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 assign(paste("MF_Coh", as.character(cty), "_", scen_name[scen],sep=""),g)
 
 tc_mh<-tc[tc$Type=="MH",]
@@ -801,7 +843,7 @@ tc_mh$order<-rep(rev(c(1:10)),each=41)
 g<-ggplot(tc_mh,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area() + scale_y_continuous(labels = scales::comma_format(accuracy = 1)) +
   labs(title = paste("Total Manuf. Housing Units by Cohort,",location ),subtitle = scenarios[scen],  y = "Total MH Stock (1,000 Units)",fill="Cohort") + theme_bw() + scale_fill_brewer(palette="Paired")+
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold")) 
-ggsave(paste("MH_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
+# ggsave(paste("MH_Coh", as.character(cty), "_", scen_name[scen],  ".tiff",sep=""),g,path = fol,width=6.415, height=5.415,units = "in")
 
 # graph dem rates by age group, by house type and census region
 # dr<-melt(cty_df[1,c(1,2,170:187)],id = c("GeoID","Year"))

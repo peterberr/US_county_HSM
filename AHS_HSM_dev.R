@@ -491,7 +491,7 @@ for (i in 1:17) {print (i)
   
 } #end to main statement, incorporating regions 
 save(summary_US,summary_NE,summary_MW,summary_S,summary_W,file='Intermediate_results/summaries.Rdata') # this will be called by the hsm_cty script
-# load('summaries_new.Rdata')
+# load('Intermediate_results/summaries.Rdata')
 
 # define linear models for H (growth ajustment factor) as a function of dVR for positive occupied and total stock growth, 
 # H is a measure for how much Total stock growth exceeds vacancy adjusted occupied stock growth
@@ -501,7 +501,7 @@ relSF<-summary_US[1:16,c("OSG_SF","TSG_SF","H_SF","dVR_SF","Con_Rate_SF","Tot_HU
 rSF<-relSF[relSF$OSG_SF>0&relSF$TSG_SF>0,] # this model can be applied to instances when neither occupied nor total stock declines.
 lmSF<-lm(H_SF~dVR_SF,data=rSF)
 windows()
-plot(H_SF~dVR_SF,data=rSF,pch=16,col="blue",main="Growth Factor vs change in Vacancy Factor, Single-Family",xlab="dVF (change in Vacancy Factor)",ylab="Growth factor (TSG/VFn*OSG)")
+plot(H_SF~dVR_SF,data=rSF,pch=16,col="blue",main="Growth Factor vs change in Vacancy Factor, Single-Family",xlab="dVF (change in Vacancy Factor)",ylab="Growth Factor")
 abline(lmSF)
 abline(h=0)
 abline(v=0)
@@ -518,7 +518,7 @@ relMF<-summary_US[1:16,c("OSG_MF","TSG_MF","H_MF","dVR_MF","Con_Rate_MF","Tot_HU
 rMF<-relMF[relMF$OSG_MF&relMF$TSG_MF>0&relMF$H_MF<2.5,]
 lmMF<-lm(H_MF~dVR_MF,data=rMF)
 windows()
-plot(H_MF~dVR_MF,data=rMF,pch=16,col="blue",main="Growth Factor vs change in Vacancy Factor, Multifamily",xlab="dVF (change in Vacancy Factor)",ylab="Growth factor (TSG/VFn*OSG)")
+plot(H_MF~dVR_MF,data=rMF,pch=16,col="blue",main="Growth Factor vs change in Vacancy Factor, Multifamily",xlab="dVF (change in Vacancy Factor)",ylab="Growth Factor")
 abline(lmMF)
 abline(h=0)
 abline(v=0)
@@ -535,10 +535,11 @@ relMH<-summary_US[1:16,c("OSG_MH","TSG_MH","H_MH","dVR_MH","Con_Rate_MH","Tot_HU
 rMH<-relMH[relMH$OSG_MH>0 & relMH$TSG_MH>0&relMH$H_MH<2.5,]
 lmMH<-lm(H_MH~dVR_MH,data=rMH)
 windows()
-plot(H_MH~dVR_MH,data=rMH,pch=16,col="blue",main="Growth Factor vs change in Vacancy Factor, Man. Homes",xlab="dVF (change in Vacancy Factor)",ylab="Growth factor (TSG/VFn*OSG)")
+plot(H_MH~dVR_MH,data=rMH,pch=16,col="blue",main="Growth Factor vs change in Vacancy Factor, Man. Homes",xlab="dVF (change in Vacancy Factor)",ylab="Growth Factor")
 abline(lmMH)
 abline(h=0)
 abline(v=0)
+
 relMH$OSG_Rate_MH<-0.5*relMH$OSG_MH/relMH$Tot_HU_MH
 lmMHc<-lm(Con_Rate_MH~OSG_Rate_MH,data=relMH[1:15,])
 windows()
