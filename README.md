@@ -3,6 +3,8 @@ A housing stock model for US counties
 
 This repository contains data and scripts used to develop a housing stock projection model for US counties, with detail on housing stocks by type (single-family, multifamily, manfactured housing), cohort, and vacancy status. 
 
+The details and results of this model will be published open-source in 'Buildings and Cities' (awaiting doi). The accepted manuscript and supporting information can be found in the 'Publication Files' folder.
+
 Instructions:
 
 1. First run AHS_HSM and housing_stock scripts. These create the intermediate data inputs required for the stock model to run, and outputs of these scripts are stored in the Intermediate_results directory.
