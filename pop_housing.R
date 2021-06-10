@@ -134,11 +134,11 @@ large_under<-p19$County.State[which(p19$popr>1.4)] # counties with ACS estimate 
 # big differences in household and resident population in Forest Cty PA likely due to the prison there https://en.wikipedia.org/wiki/Forest_County,_Pennsylvania
 # Lake Cty TN, prison
 # Jones Cty TX, prison
-# Williamsburg VA colleget town
+# Williamsburg VA college town
 
 # big difference in Dagget Utah (49009) likely due to the low population there 
 # big difference in Lexington city VA (51678) likely due to the existence of the Virginia Military Institute there
-# otherwise, looks ok\
+# otherwise, looks ok
 # some of the counties with unusually low estimates of resident population includ"
 # Cottle County Texas (low pop)
 

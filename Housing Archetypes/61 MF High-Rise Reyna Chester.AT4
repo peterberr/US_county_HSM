@@ -1,0 +1,884 @@
+<?xml version="1.0"?>
+<Project xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ApplicationName>Athena Impact Estimator for Buildings</ApplicationName>
+  <ApplicationVersion>5.4.0103</ApplicationVersion>
+  <ProjectLifeSpan>100</ProjectLifeSpan>
+  <CityName>Atlanta</CityName>
+  <ProjectTypeName>Commercial</ProjectTypeName>
+  <ProjectID>a3e31ee6-e9bc-43d5-a9f9-d779532da70a</ProjectID>
+  <Name>MF High-Rise Reyna Chester</Name>
+  <TreeNodeType>0</TreeNodeType>
+  <GroupList>
+    <anyType xsi:type="AssemblyGroup">
+      <AssemblyList />
+      <TreeNodeType>2</TreeNodeType>
+      <Name>Columns and Beams</Name>
+      <ID>3</ID>
+    </anyType>
+    <anyType xsi:type="AssemblyGroup">
+      <AssemblyList />
+      <TreeNodeType>8</TreeNodeType>
+      <Name>Floors</Name>
+      <ID>4</ID>
+    </anyType>
+    <anyType xsi:type="AssemblyGroup">
+      <AssemblyList />
+      <TreeNodeType>9</TreeNodeType>
+      <Name>Roofs</Name>
+      <ID>5</ID>
+    </anyType>
+    <anyType xsi:type="AssemblyGroup">
+      <AssemblyList />
+      <TreeNodeType>4</TreeNodeType>
+      <Name>Foundations</Name>
+      <ID>1</ID>
+    </anyType>
+    <anyType xsi:type="AssemblyGroup">
+      <AssemblyList />
+      <TreeNodeType>5</TreeNodeType>
+      <Name>Walls</Name>
+      <ID>2</ID>
+    </anyType>
+    <anyType xsi:type="AssemblyGroup">
+      <AssemblyList>
+        <anyType xsi:type="ExtraMaterialAssembly">
+          <Assembly_Id>47</Assembly_Id>
+          <AssemblyGroup_id>6</AssemblyGroup_id>
+          <X>0</X>
+          <Y>0</Y>
+          <Z>0</Z>
+          <SpanScalingFactor>1</SpanScalingFactor>
+          <Area>0</Area>
+          <Volume>0</Volume>
+          <Weight>1</Weight>
+          <AssemblyVariant_id>0</AssemblyVariant_id>
+          <AssemblyVariantCriterion />
+          <Units>2</Units>
+          <UnitsID>2</UnitsID>
+          <AssemblyType>EM_EXTRABASICMATERIAL</AssemblyType>
+          <AssemblyUserName>Project Extra Materials</AssemblyUserName>
+          <AssemblyFormalName>Extra Materials</AssemblyFormalName>
+          <ID>549a7769-efea-4f6a-b836-0fcd33a99a4b</ID>
+          <TreeNodeType>7</TreeNodeType>
+          <AssemblyConstructionType>MaterialAndTransportationArea</AssemblyConstructionType>
+          <SummaryMeasureValue>2796908.8246525196512096198173</SummaryMeasureValue>
+          <IsSubAssembly>false</IsSubAssembly>
+          <ActionType>Add</ActionType>
+          <EMMaterialList>
+            <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+              <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="MaterialList" msdata:UseCurrentLocale="true">
+                <xs:complexType>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="MaterialList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Id" type="xs:int" />
+                          <xs:element name="Value" type="xs:decimal" minOccurs="0" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:choice>
+                </xs:complexType>
+                <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+                  <xs:selector xpath=".//MaterialList" />
+                  <xs:field xpath="Id" />
+                </xs:unique>
+              </xs:element>
+            </xs:schema>
+            <diffgr:diffgram xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1">
+              <DocumentElement>
+                <MaterialList diffgr:id="MaterialList1" msdata:rowOrder="0" diffgr:hasChanges="inserted">
+                  <Id>94</Id>
+                  <Value>600.00000000000000000000000002</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList2" msdata:rowOrder="1" diffgr:hasChanges="inserted">
+                  <Id>56</Id>
+                  <Value>7060.6313133424564122145205624</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList3" msdata:rowOrder="2" diffgr:hasChanges="inserted">
+                  <Id>52</Id>
+                  <Value>929.0304359661126858177000740</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList4" msdata:rowOrder="3" diffgr:hasChanges="inserted">
+                  <Id>55</Id>
+                  <Value>4436.1203317381880747795178534</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList5" msdata:rowOrder="4" diffgr:hasChanges="inserted">
+                  <Id>49</Id>
+                  <Value>966.1916534047571932504080770</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList6" msdata:rowOrder="5" diffgr:hasChanges="inserted">
+                  <Id>395</Id>
+                  <Value>22.906421146119380102348611236</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList7" msdata:rowOrder="6" diffgr:hasChanges="inserted">
+                  <Id>107</Id>
+                  <Value>48534.441309613448122578947849</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList8" msdata:rowOrder="7" diffgr:hasChanges="inserted">
+                  <Id>292</Id>
+                  <Value>818.0734599384839340311678343</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList9" msdata:rowOrder="8" diffgr:hasChanges="inserted">
+                  <Id>293</Id>
+                  <Value>92.51111089023977197922552145</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList10" msdata:rowOrder="9" diffgr:hasChanges="inserted">
+                  <Id>17</Id>
+                  <Value>85630</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList11" msdata:rowOrder="10" diffgr:hasChanges="inserted">
+                  <Id>79</Id>
+                  <Value>4436.1203317381880747795178534</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList12" msdata:rowOrder="11" diffgr:hasChanges="inserted">
+                  <Id>102</Id>
+                  <Value>255.48336989068098859986752035</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList13" msdata:rowOrder="12" diffgr:hasChanges="inserted">
+                  <Id>44</Id>
+                  <Value>2787.0913078983380574531002220</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList14" msdata:rowOrder="13" diffgr:hasChanges="inserted">
+                  <Id>30</Id>
+                  <Value>90.71849958859160436573707420</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList15" msdata:rowOrder="14" diffgr:hasChanges="inserted">
+                  <Id>29</Id>
+                  <Value>24.720791137891212189663352720</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList16" msdata:rowOrder="15" diffgr:hasChanges="inserted">
+                  <Id>31</Id>
+                  <Value>45.359249794295802182868537100</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList17" msdata:rowOrder="16" diffgr:hasChanges="inserted">
+                  <Id>86</Id>
+                  <Value>5.0711641270022706840447024478</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList18" msdata:rowOrder="17" diffgr:hasChanges="inserted">
+                  <Id>58</Id>
+                  <Value>11.793404946516908567545819646</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList19" msdata:rowOrder="18" diffgr:hasChanges="inserted">
+                  <Id>18</Id>
+                  <Value>1567.3370026858804343587794956</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList20" msdata:rowOrder="19" diffgr:hasChanges="inserted">
+                  <Id>19</Id>
+                  <Value>4.2365539307872279238799213651</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList21" msdata:rowOrder="20" diffgr:hasChanges="inserted">
+                  <Id>23</Id>
+                  <Value>83.00742712356131799464942289</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList22" msdata:rowOrder="21" diffgr:hasChanges="inserted">
+                  <Id>35</Id>
+                  <Value>63.500000000000000000000000002</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList23" msdata:rowOrder="22" diffgr:hasChanges="inserted">
+                  <Id>61</Id>
+                  <Value>0.1360777493828874065486056113</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList24" msdata:rowOrder="23" diffgr:hasChanges="inserted">
+                  <Id>24</Id>
+                  <Value>299.37104864235229440693234486</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList25" msdata:rowOrder="24" diffgr:hasChanges="inserted">
+                  <Id>84</Id>
+                  <Value>34092.043073182680008346109536</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList26" msdata:rowOrder="25" diffgr:hasChanges="inserted">
+                  <Id>21</Id>
+                  <Value>1.6057174427180713972735462133</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList27" msdata:rowOrder="26" diffgr:hasChanges="inserted">
+                  <Id>33</Id>
+                  <Value>16.800000000000000000000000000</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList28" msdata:rowOrder="27" diffgr:hasChanges="inserted">
+                  <Id>34</Id>
+                  <Value>101.00000000000000000000000000</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList29" msdata:rowOrder="28" diffgr:hasChanges="inserted">
+                  <Id>63</Id>
+                  <Value>9387.819531282826611894291638</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList30" msdata:rowOrder="29" diffgr:hasChanges="inserted">
+                  <Id>116</Id>
+                  <Value>810.7091196414685741519577926</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList31" msdata:rowOrder="30" diffgr:hasChanges="inserted">
+                  <Id>96</Id>
+                  <Value>1200.0000000000000000000000000</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList32" msdata:rowOrder="31" diffgr:hasChanges="inserted">
+                  <Id>62</Id>
+                  <Value>880.1080810577649948650898411</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList33" msdata:rowOrder="32" diffgr:hasChanges="inserted">
+                  <Id>20</Id>
+                  <Value>0.8255383462561835997282073752</Value>
+                </MaterialList>
+                <MaterialList diffgr:id="MaterialList34" msdata:rowOrder="33" diffgr:hasChanges="inserted">
+                  <Id>28</Id>
+                  <Value>0.8890412959681977227842233272</Value>
+                </MaterialList>
+              </DocumentElement>
+            </diffgr:diffgram>
+          </EMMaterialList>
+        </anyType>
+      </AssemblyList>
+      <TreeNodeType>6</TreeNodeType>
+      <Name>Project Extra Materials</Name>
+      <ID>6</ID>
+    </anyType>
+  </GroupList>
+  <GrossFloorArea>1.000</GrossFloorArea>
+  <BuildingHeight>30</BuildingHeight>
+  <OperationalEnergy>
+    <ElectricityUnit>kWh</ElectricityUnit>
+    <NaturalGasUnit>m³</NaturalGasUnit>
+    <LiquifiedPetrolumeGasUnit>Litre</LiquifiedPetrolumeGasUnit>
+    <HeavyFuelUnit>Litre</HeavyFuelUnit>
+    <DieselUnit>Litre</DieselUnit>
+    <CoalUnit>kg</CoalUnit>
+    <GasolineUnit>Litre</GasolineUnit>
+    <Electricity>0</Electricity>
+    <NaturalGas>0</NaturalGas>
+    <LiquifiedPetrolumeGas>0</LiquifiedPetrolumeGas>
+    <HeavyFuel>0</HeavyFuel>
+    <Diesel>0</Diesel>
+    <Coal>0</Coal>
+    <Gasoline>0</Gasoline>
+    <EnergyList>
+      <Energy>
+        <EnergyId>8</EnergyId>
+        <Name>Bituminous Coal (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>24.7612777131</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0403856381</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>7</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>6</EnergyId>
+        <Name>Coal (Industrial Boiler)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>24.7612777131</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0403856381</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>7</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>13</EnergyId>
+        <Name>Coke</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>28.8300000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0346861000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>8</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>17</EnergyId>
+        <Name>Diesel (Heavy Equipment)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0258650887</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0258650887</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>2</EnergyId>
+        <Name>Diesel (Industrial Boiler)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>16</EnergyId>
+        <Name>Diesel Rail</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>36</EnergyId>
+        <Name>Diesel Road Long Haul</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>15</EnergyId>
+        <Name>Diesel Road Short Haul</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>1</EnergyId>
+        <Name>Electricity</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>3.6000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>false</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>1</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>22</EnergyId>
+        <Name>Fuel Oil (Commercial)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>41.7283647939</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0239645144</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8860000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>20</EnergyId>
+        <Name>Fuel Oil (Residential)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>41.7283647939</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0239645144</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8860000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>27</EnergyId>
+        <Name>Gaseous Renewable Fuels (Biomass) (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>14</EnergyId>
+        <Name>Gasoline</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>34.8711986354</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0286769609</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>3</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.7200000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>30</EnergyId>
+        <Name>Geothermal (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>7</EnergyId>
+        <Name>Heavy Fuel Oil (Industrial Boiler)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>41.7283647939</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0239645144</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>8</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8860000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>11</EnergyId>
+        <Name>Hydroelectric (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>10</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>24</EnergyId>
+        <Name>Lignite coal (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>15.0124687026</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0666112962</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>7</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>26</EnergyId>
+        <Name>Liquid Renewable Fuels (Biomass) (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>3</EnergyId>
+        <Name>LPG (Industrial Boiler)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>26.6202995178</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0375653174</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>2</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.5100000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>21</EnergyId>
+        <Name>Natural Gas (Commercial)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.8486636196</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0257409112</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>5</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.7000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>m3</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>10</EnergyId>
+        <Name>Natural Gas (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.7356219214</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258160306</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>5</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.7000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>m3</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>4</EnergyId>
+        <Name>Natural Gas (Industrial Boiler)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.8486636196</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0257409112</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>5</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.7000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>m3</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>19</EnergyId>
+        <Name>Natural Gas (Residential)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.8486636196</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0257409112</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>5</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.7000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>m3</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>12</EnergyId>
+        <Name>Nuclear (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>2289796.5421189400</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0000004367</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>9</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>34</EnergyId>
+        <Name>Other Fuels (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>33</EnergyId>
+        <Name>Other Gases (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>9</EnergyId>
+        <Name>Petroleum (DFO) (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>32</EnergyId>
+        <Name>Petroleum (Other Fossil) (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>31</EnergyId>
+        <Name>Petroleum (RFO) (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>38.6621522840</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0258650887</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>4</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8800000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>18</EnergyId>
+        <Name>Residual Fuel Oil Water</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>41.7283647939</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0239645144</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>8</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>0.8860000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>litres</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>29</EnergyId>
+        <Name>Solar (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>25</EnergyId>
+        <Name>Solid Renewable Fuels (Biomass) (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>23</EnergyId>
+        <Name>Subbituminous Coal (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>24.7612777131</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0403856381</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>7</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>35</EnergyId>
+        <Name>Tidal (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>28</EnergyId>
+        <Name>Wind (Electricity)</Name>
+        <ValueConstructionEnergyFuelBreakdown>1.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>1.0000000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>1.0000000000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>kWh</Unit>
+        <Conversion>3.6</Conversion>
+        <EnergyGroup_Id>12</EnergyGroup_Id>
+        <IsPrimaryEnergy>false</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>mj</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+      <Energy>
+        <EnergyId>5</EnergyId>
+        <Name>Wood (Industrial Boiler)</Name>
+        <ValueConstructionEnergyFuelBreakdown>0.0000000000</ValueConstructionEnergyFuelBreakdown>
+        <ValueDemolitionEnergyFuelBreakdown>0.0000000000</ValueDemolitionEnergyFuelBreakdown>
+        <ValueManufacturingEnergyConversionFactor>10.4700000000</ValueManufacturingEnergyConversionFactor>
+        <ValueOperationalEnergyFuelBreakdown>0.0955110000</ValueOperationalEnergyFuelBreakdown>
+        <IsFuel>true</IsFuel>
+        <Unit>MJ</Unit>
+        <Conversion>1.0</Conversion>
+        <EnergyGroup_Id>6</EnergyGroup_Id>
+        <IsPrimaryEnergy>true</IsPrimaryEnergy>
+        <ConversionFactorToKgs>1.0000000000</ConversionFactorToKgs>
+        <UnitPhysicalQuantity>kg</UnitPhysicalQuantity>
+        <PhysicalQuantity>0</PhysicalQuantity>
+        <IsEnabled>true</IsEnabled>
+      </Energy>
+    </EnergyList>
+  </OperationalEnergy>
+  <ProjectNumber>61</ProjectNumber>
+  <ProjectDescription />
+  <Unit>1</Unit>
+  <SyncronizeProjectAndAsemblyDisplayUnits>false</SyncronizeProjectAndAsemblyDisplayUnits>
+  <ProjectFilePath>C:\Users\pb637\Documents\Yale Courses\Research\US Housing\Athena MI Archetypes\61 MF High-Rise Reyna Chester.AT4</ProjectFilePath>
+  <ProjectPool>
+    <ProjectName>MF High-Rise Reyna Chester</ProjectName>
+    <Unit>1</Unit>
+    <CountryId>2</CountryId>
+    <RegionId>12</RegionId>
+    <CityId>9</CityId>
+    <ProjectTypeId>7</ProjectTypeId>
+    <ProjectLifeSpan>100</ProjectLifeSpan>
+    <BuildingHeight>30</BuildingHeight>
+  </ProjectPool>
+  <CustomMaterialCompositeProductList />
+</Project>

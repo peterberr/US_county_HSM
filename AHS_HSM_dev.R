@@ -1,4 +1,6 @@
-# Script to view sas AHS case history files in R, and calculate various parameters for use in HSM projections##########
+# Script to view sas AHS case history files in R, and develop various relations, data objects, and and parameters for use in Housing Stock Model (HSM) projections ##########
+# Peter Berrill
+# March 2021
 rm(list=ls()) # clear workspace i.e. remove saved variables
 cat("\014") # clear console
 # library(sas7bdat)
@@ -11,8 +13,8 @@ source('run_sm.R') # function to run stock model
 # download the two sample case history files from the following link: http://www2.census.gov/programs-surveys/ahs/2017/Sample%20Case%20History.zip
 # sch1<-read.sas7bdat("AHSNCaseHistory1985to2013.sas7bdat")
 # sch2<-read.sas7bdat("AHSCaseHistory2015to2017.sas7bdat")
-# save(sch1,file = "CaseHistory8513.RData")
-# save(sch2,file = "CaseHistory1517.RData")
+# save(sch1,file = "Data/CaseHistory8513.RData")
+# save(sch2,file = "Data/CaseHistory1517.RData")
 load("Data/CaseHistory8513.RData")
 load("Data/CaseHistory1517.RData")
 load("Data/AHS_All_1973_2019.RData") # compiled selected variables from AHS microdata 1973-2019
@@ -109,13 +111,12 @@ summary_US<-summary
 # extend years to 2021
 years=c(seq(1987,2013,2),2017,2019,2021)
 Vn_SF<-1.1 # estimate 'natural' vacancy rate of 1.1 for SF housing
-Vn_MF<-1.18 # estimate 'natural' vacancy rate of 1.17 for MF housing
+Vn_MF<-1.18 # estimate 'natural' vacancy rate of 1.18 for MF housing
 Vn_MH<-1.26 # estimate 'natural' vacancy rate of 1.26 for MH housing
 # PUT LARGE CREATE SUMMARY FUNCTION BEFORE MAIN LOOP
 # This function creates the summary data frame for each region, given inputs of the basic input population and housing stock data,
 # details about the houses exiting and returning to the stock, and the next ahs survey.
-create_summary <- function(summary,loss_det,return_det,loss_dem_det,ahsnext) { # begin large function
-  
+create_summary <- function(summary,loss_det,return_det,loss_dem_det,ahsnext) { # begin function
   if (i<16) { 
     UndCon<-return_det %>% filter(get(rsn0)==11) # how many units 'returned' that were under construction in previous survey
     TotRet<-return_det %>% filter(get(stat0)==4) # how many units in total returned from no-int in previous survey
@@ -291,7 +292,7 @@ for (i in 1:17) {print (i)
   }
   rsn<-paste("NOINT",substr(as.character(yr),3,4),sep = "") # reason for no interview 
   rsn0<-paste("NOINT",substr(as.character(yr-2),3,4),sep = "") # reason for no interview two years ago
-  # in the next step i single out units who are demolished in year Y but still in stock two years previous, this doesn't work when i = 16, years = 2019
+  # in the next step single out units who are demolished in year Y but still in stock two years previous, this doesn't work when i = 16, years = 2019
   if (i<15) {
   loss<-sch1 %>% filter(get(statY) == "4" & (get(stat0)=="1"|get(stat0)=="2"|get(stat0)=="3") & get(rsn)>6 & get(rsn)<42 ) #  review this, to consider higher loss of MF, reason also equals 31
   lossdem<-sch1 %>% filter(get(statY) == "4" & (get(stat0)=="1"|get(stat0)=="2"|get(stat0)=="3") & (get(rsn)==30|get(rsn)==31))
@@ -490,12 +491,12 @@ for (i in 1:17) {print (i)
   
   
 } #end to main statement, incorporating regions 
-save(summary_US,summary_NE,summary_MW,summary_S,summary_W,file='Intermediate_results/summaries.Rdata') # this will be called by the hsm_cty script
+save(summary_US,summary_NE,summary_MW,summary_S,summary_W,file='Intermediate_results/summaries.Rdata') # this data object will be called by the hsm_cty script
 # load('Intermediate_results/summaries.Rdata')
 
-# define linear models for H (growth ajustment factor) as a function of dVR for positive occupied and total stock growth, 
-# H is a measure for how much Total stock growth exceeds vacancy adjusted occupied stock growth
-# and for construction as a function of OSG for negative values of OSG
+# define linear models for H (growth adjustment factor) as a function of dVR for positive occupied and total stock growth
+# H is a measure for how much Total stock growth exceeds vacancy adjusted occupied stock growth (OSG). H is termed 'GF' in the manuscript and SI files.
+# define linear models for construction as a function of OSG for negative values of OSG
 # It will be used to estimate H (how much construction is less than what would be expected by VOSG in cases when the vacancy rate declines.) This will help to predict construction quantities when there is "too much" vacancy
 relSF<-summary_US[1:16,c("OSG_SF","TSG_SF","H_SF","dVR_SF","Con_Rate_SF","Tot_HU_SF")]
 rSF<-relSF[relSF$OSG_SF>0&relSF$TSG_SF>0,] # this model can be applied to instances when neither occupied nor total stock declines.
@@ -558,7 +559,7 @@ SF_growth_returns_pc<-mean(summary_US$PcNewConsReturnsNotNew_SF[5:16]) # around 
 MF_growth_returns_pc<-mean(summary_US$PcNewConsReturnsNotNew_MF[9:16]) # around 18% for multifamily
 MH_growth_returns_pc<-mean(summary_US$PcNewConsReturnsNotNew_MH[2:10]) # around 22% for manufactured homes
 
-# dem/total removale by type region
+# dem/total loss by type region
 mean(summary_NE$Demol_Rate_SF[1:15]) # 23% NE SF
 mean(summary_MW$Demol_Rate_SF[1:15]) # 37% MW
 mean(summary_S$Demol_Rate_SF[1:15]) # 33% S
@@ -602,7 +603,7 @@ text(2010,1.12,paste("mean: ",round(mean(summary_US$VR_MF),3),sep = ""))
 windows()
 plot(summary_US$Year,summary_US$VR_MH,type = "b",frame=FALSE, pch=19,col="red",ylim=c(1.2,1.35),xlim=c(1985,2019),xlab = "Year",ylab = "Vacancy Ratio (Tot Units/Occ. Units)",main = "Vacancy Ratio for manufactured homes, 1985-2017") # vacancy rate for MH hovers around 1.1 until 2001, reaches a peak of over 1.13 in 2009, and comes back to 1.12 by 2015 and under 1.11 by 2017. natural rate=1.1
 text(2010,1.2,paste("mean: ",round(mean(summary_US$VR_MH),3),sep = ""))
-# vacancy factors US average
+# vacancy factors US average. Fig S8 in supporting information
 windows()
 plot(summary_US$Year,summary_US$VR_SF,type = "b",frame=FALSE, pch=19,col="red",ylim=c(1.05,1.35),xlim=c(1985,2019),xlab = "Year",ylab = "Vacancy Factor (Tot Units/Occ. Units)",main = "Vacancy Factor for all home types, US avg, 1985-2019") # vacancy rate for SF hovers around 1.1 until 2001, reaches a peak of over 1.13 in 2009, and comes back to 1.12 by 2015 and under 1.11 by 2017. natural rate=1.1
 lines(summary_US$Year,summary_US$VR_MF,type="b",pch=19,col="blue")
@@ -611,7 +612,7 @@ text(1990,1.06,paste("mean SF: ",round(mean(summary_US$VR_SF),3),sep = ""))
 text(2002,1.06,paste("mean MF: ",round(mean(summary_US$VR_MF),3),sep = ""))
 text(2014,1.06,paste("mean MH: ",round(mean(summary_US$VR_MH),3),sep = ""))
 legend("topleft",legend = c("MH","MF","SF"),col=c("darkgreen","blue","red"),lty=c(1,1,1),cex=0.95)
-# vacancy ratios US average
+# vacancy ratios US average. Fig S8 in supporting information
 windows()
 plot(summary_US$Year,(summary_US$VR_SF-1)/summary_US$VR_SF,type = "b",frame=FALSE, pch=19,col="red",ylim=c(0.05,0.25),xlim=c(1985,2019),xlab = "Year",ylab = "Vacancy Ratio (Vac Units/Tot Units)",main = "Vacancy Ratio for all home types, US avg, 1985-2019") # vacancy rate for SF hovers around 1.1 until 2001, reaches a peak of over 1.13 in 2009, and comes back to 1.12 by 2015 and under 1.11 by 2017. natural rate=1.1
 lines(summary_US$Year,(summary_US$VR_MF-1)/summary_US$VR_MF,type="b",pch=19,col="blue")
@@ -659,7 +660,7 @@ text(2002,1.06,paste("mean MF: ",round(mean(summary_S$VR_MF),3),sep = ""))
 text(2014,1.06,paste("mean MH: ",round(mean(summary_S$VR_MH),3),sep = ""))
 # legend("topleft",legend = c("MH","MF","SF"),col=c("darkgreen","blue","red"),lty=c(1,1,1),cex=0.95)
 
-# Now create stock turnover model and see how well it applies at the national level ##########
+# Now create stock turnover model and apply it at the national level ##########
 graphics.off()
 create_sm_df<- function (summary) { # function to create the data frame, with the model outputs empty
 sum_cn<-names(summary) # column names of summary dataframe
@@ -698,7 +699,7 @@ stockModel_df
 }
 stockModel_df_US<-create_sm_df(summary_US)
 smod_cn<-names(stockModel_df_US) # column names
-# define vacancy rates
+# define vacancy rates, based on the US_summary averages above (e.g. mean(summary_US$VR_SF))
 Vn_SF<-1.106 # estimate 'natural' vacancy rate of 1.1 for SF housing
 Vn_MF<-1.181 # estimate 'natural' vacancy rate of 1.18 for MF housing
 Vn_MH<-1.257 # estimate 'natural' vacancy rate of 1.26 for MH housing
@@ -734,7 +735,7 @@ Vn_MH<-1.28 # estimate 'natural' vacancy rate of 1.26 for MH housing
 stockModel_df_S<-create_sm_df(summary_S)
 stockModel_S<-run_sm(stockModel_df_S)
 
-# make some plots to compare the years, US Avg ############
+# make some plots to compare the years and validate the model, US Avg ############
 graphics.off()
 windows()
 plot(summary_US$Year, summary_US$Tot_HU_SF, type = "b",frame=FALSE, pch=19,col="red",ylim=c(6e7,9.5e7),xlab = "Year",ylab = "Tot Sin-Fam Units",main = "Model validation: Total SF Units")
@@ -768,7 +769,7 @@ lines(con2yr[con2yr$Region=="National",]$Year[1:15],50000*con2yr[con2yr$Region==
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_US$Con_Rate_SF[1:15]),3),sep = ""))
 text(1995,0.65,paste("Model mean: ",round(mean(100*stockModel_US$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.5,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="National",]$SF2yr/summary_US$Tot_HU_SF[1:15]),3),sep = ""))
+text(1995,0.5,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="National",]$SF2yr/summary_US$Tot_HU_SF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_US$Year[1:15], 2*summary_US$Dem_SF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,1.1e6),xlab = "Year",ylab = "SF Units removed every 2 years",main = "Model validation: Total SF Demolition")
@@ -898,7 +899,6 @@ text(1995,2.0,paste("Model mean: ",100*round(mean(stockModel_US$Dem_Rate_MH[1:15
 windows()
 plot(summary_US$Year[1:15],100*summary_US$Demol_Rate_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",xlab = "Year",ylab = "Demolition / Tot Removals (%)",main = "Demolition percent of total stock removals, MH")
 text(1990,40,paste("Mean percent: ",round(mean(100*summary_US$Demol_Rate_MH[1:15]),1),"%",sep = ""))
-## Pick up HERE!!! fix the calculation of construction rate, consider what improvements can and should be made to the data (e.g. estimation of age)), then run the stock Model for 4 regions, perhaps turning it into a function first?
 # make some plots to compare the years, NE ############
 graphics.off()
 windows()
@@ -929,18 +929,11 @@ text(2010,1.107,paste("Model mean: ",round(mean(stockModel_NE$VR_SF),3),sep = ""
 windows() 
 plot(summary_NE$Year[1:15], summary_NE$Con_Rate_SF[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(-0.5,3.5), xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: SF Con Rates, NE")
 lines(stockModel_NE$Year[1:15],stockModel_NE$Con_Rate_SF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="Northeast",]$Year,50000*con2yr[con2yr$Region=="Northeast",]$SF2yr/summary_NE$Tot_HU_SF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="Northeast",]$Year,50000*con2yr[con2yr$Region=="Northeast",]$SF2yr/summary_NE$Tot_HU_SF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
-text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_NE$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.65,paste("Model mean: ",round(mean(100*stockModel_NE$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.5,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Northeast",]$SF2yr/summary_NE$Tot_HU_SF[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_NE$Year[1:15], 2*summary_NE$Dem_SF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,2e5),xlab = "Year",ylab = "SF Units removed every 2 years",main = "Model validation: Total SF Demolition. NE")
-# lines(summary_NE$Year[1:15],2*summary_NE$Demol_SF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,6e5,paste("Total mean: ",2*round(mean(summary_NE$Dem_SF[1:15])),sep = ""))
-# text(1990,5e5,paste("Demol mean: ",2*round(mean(summary_NE$Demol_SF[1:15])),sep = ""))
+text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_NE$Con_Rate_SF[1:16]),3),sep = ""))
+text(1995,0.65,paste("Model mean: ",round(mean(100*stockModel_NE$Con_Rate_SF[1:16]),3),sep = ""))
+text(1995,0.5,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Northeast",]$SF2yr/summary_NE$Tot_HU_SF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_NE$Year[1:15], 100*summary_NE$Dem_Rate_SF[1:15], type = "b",frame=FALSE, ylim=c(0.2,0.8), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: SF Demolition Rates, NE")
@@ -982,18 +975,12 @@ text(1990,1.16,paste("Model mean: ",round(mean(stockModel_NE$VR_MF),3),sep = "")
 windows() 
 plot(summary_NE$Year[1:15], summary_NE$Con_Rate_MF[1:15]*100, type = "b",frame=FALSE,ylim=c(-0.9,4), pch=19,col="red",xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MF Con Rates, NE")
 lines(stockModel_NE$Year[1:15],stockModel_NE$Con_Rate_MF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="Northeast",]$Year,50000*con2yr[con2yr$Region=="Northeast",]$MF2yr/summary_NE$Tot_HU_MF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="Northeast",]$Year,50000*con2yr[con2yr$Region=="Northeast",]$MF2yr/summary_NE$Tot_HU_MF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,1.8,paste("AHS mean: ",100*round(mean(summary_NE$Con_Rate_MF[1:15]),4),sep = ""))
 text(1995,1.6,paste("Model mean: ",100*round(mean(stockModel_NE$Con_Rate_MF[1:15]),4),sep = ""))
-text(1995,1.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Northeast",]$MF2yr/summary_NE$Tot_HU_MF[1:15]),3),sep = ""))
+text(1995,1.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Northeast",]$MF2yr/summary_NE$Tot_HU_MF[1:16]),3),sep = ""))
 
-# windows()
-# plot(summary_NE$Year[1:15], 2*summary_NE$Dem_MF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,3e5),xlab = "Year",ylab = "MF Units removed every 2 years",main = "Model validation: Total MF Demolition. NE")
-# lines(summary_NE$Year[1:15],2*summary_NE$Demol_MF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,2.7e5,paste("Total mean: ",2*round(mean(summary_NE$Dem_MF[1:15])),sep = ""))
-# text(1990,2.5e5,paste("Demol mean: ",2*round(mean(summary_NE$Demol_MF[1:15])),sep = ""))
 
 windows()
 plot(summary_NE$Year[1:15], 100*summary_NE$Dem_Rate_MF[1:15], type = "b",frame=FALSE, ylim=c(0.5,1.5), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MF Demolition Rates, NE")
@@ -1039,14 +1026,6 @@ lines(stockModel_NE$Year[1:15],stockModel_NE$Con_Rate_MH[1:15]*100,col="blue",ty
 legend("topleft",legend = c("AHS values","Modeled values","MHS values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,2,paste("AHS mean: ",round(100*mean(summary_NE$Con_Rate_MH[1:15]),3),sep = ""))
 text(1995,1.5,paste("Model mean: ",round(mean(100*stockModel_NE$Con_Rate_MH[1:15]),3),sep = ""))
-# text(1995,1,paste("MHS mean: ",round(mean(50000*mhs2yr$MH2yr/summary_NE$Tot_HU_MH[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_NE$Year[1:15], 2*summary_NE$Dem_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,1e5),xlab = "Year",ylab = "MH Units removed every 2 years",main = "Model validation: Total MH Demolition. NE")
-# lines(summary_NE$Year[1:15],2*summary_NE$Demol_MH[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,4e5,paste("Total mean: ",2*round(mean(summary_NE$Dem_MH[1:15])),sep = ""))
-# text(1990,3.5e5,paste("Demol mean: ",2*round(mean(summary_NE$Demol_MH[1:15])),sep = ""))
 
 windows()
 plot(summary_NE$Year[1:15], 100*summary_NE$Dem_Rate_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MH Demolition Rates, NE")
@@ -1089,18 +1068,11 @@ text(2010,1.107,paste("Model mean: ",round(mean(stockModel_MW$VR_SF),3),sep = ""
 windows() 
 plot(summary_MW$Year[1:15], summary_MW$Con_Rate_SF[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(-0.5,3.5), xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: SF Con Rates, MW")
 lines(stockModel_MW$Year[1:15],stockModel_MW$Con_Rate_SF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="Midwest",]$Year,50000*con2yr[con2yr$Region=="Midwest",]$SF2yr/summary_MW$Tot_HU_SF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="Midwest",]$Year,50000*con2yr[con2yr$Region=="Midwest",]$SF2yr/summary_MW$Tot_HU_SF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
-text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_MW$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.65,paste("Model mean: ",round(mean(100*stockModel_MW$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.5,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Midwest",]$SF2yr/summary_MW$Tot_HU_SF[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_MW$Year[1:15], 2*summary_MW$Dem_SF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,2e5),xlab = "Year",ylab = "SF Units removed every 2 years",main = "Model validation: Total SF Demolition. MW")
-# lines(summary_MW$Year[1:15],2*summary_MW$Demol_SF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,6e5,paste("Total mean: ",2*round(mean(summary_MW$Dem_SF[1:15])),sep = ""))
-# text(1990,5e5,paste("Demol mean: ",2*round(mean(summary_MW$Demol_SF[1:15])),sep = ""))
+text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_MW$Con_Rate_SF[1:16]),3),sep = ""))
+text(1995,0.65,paste("Model mean: ",round(mean(100*stockModel_MW$Con_Rate_SF[1:16]),3),sep = ""))
+text(1995,0.5,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Midwest",]$SF2yr/summary_MW$Tot_HU_SF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_MW$Year[1:15], 100*summary_MW$Dem_Rate_SF[1:15], type = "b",frame=FALSE, ylim=c(0.3,0.7), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: SF Demolition Rates, MW")
@@ -1142,18 +1114,11 @@ text(1990,1.16,paste("Model mean: ",round(mean(stockModel_MW$VR_MF),3),sep = "")
 windows() 
 plot(summary_MW$Year[1:15], summary_MW$Con_Rate_MF[1:15]*100, type = "b",frame=FALSE,ylim=c(-0.9,4), pch=19,col="red",xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MF Con Rates, MW")
 lines(stockModel_MW$Year[1:15],stockModel_MW$Con_Rate_MF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="Midwest",]$Year,50000*con2yr[con2yr$Region=="Midwest",]$MF2yr/summary_MW$Tot_HU_MF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="Midwest",]$Year,50000*con2yr[con2yr$Region=="Midwest",]$MF2yr/summary_MW$Tot_HU_MF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
-text(1995,1.8,paste("AHS mean: ",100*round(mean(summary_MW$Con_Rate_MF[1:15]),4),sep = ""))
-text(1995,1.6,paste("Model mean: ",100*round(mean(stockModel_MW$Con_Rate_MF[1:15]),4),sep = ""))
-text(1995,1.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Midwest",]$MF2yr/summary_MW$Tot_HU_MF[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_MW$Year[1:15], 2*summary_MW$Dem_MF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,3e5),xlab = "Year",ylab = "MF Units removed every 2 years",main = "Model validation: Total MF Demolition. MW")
-# lines(summary_MW$Year[1:15],2*summary_MW$Demol_MF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,2.7e5,paste("Total mean: ",2*round(mean(summary_MW$Dem_MF[1:15])),sep = ""))
-# text(1990,2.5e5,paste("Demol mean: ",2*round(mean(summary_MW$Demol_MF[1:15])),sep = ""))
+text(1995,1.8,paste("AHS mean: ",100*round(mean(summary_MW$Con_Rate_MF[1:16]),4),sep = ""))
+text(1995,1.6,paste("Model mean: ",100*round(mean(stockModel_MW$Con_Rate_MF[1:16]),4),sep = ""))
+text(1995,1.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="Midwest",]$MF2yr/summary_MW$Tot_HU_MF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_MW$Year[1:15], 100*summary_MW$Dem_Rate_MF[1:15], type = "b",frame=FALSE, ylim=c(0.5,2), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MF Demolition Rates, MW")
@@ -1182,7 +1147,6 @@ lines(summary_MW$Year[1:15],rep(0,15),col="black",type = "l",lty=1)
 legend("topleft",legend = c("AHS apparent values","Modeled values","MHS data","AHS next-year values"),col=c("red","blue","forestgreen","gold"),lty=c(1,2,1,2),cex=0.75)
 text(2000,2e5,paste("AHS app. mean: ",2*round(mean(summary_MW$Con_MH_calc[1:15])),sep = ""),cex=0.8)
 text(2000,1.8e5,paste("Model mean: ",round(mean(stockModel_MW$Con_MH[1:15])),sep = ""),cex=0.8)
-# text(2000,1.6e5,paste("MHS mean: ",round(mean(1000*mhs2yr$MH2yr)),sep = ""),cex=0.8)
 text(2000,1.4e5,paste("AHS nxt-yr mean: ",2*round(mean(summary_MW$Con_MH[1:15])),sep = ""),cex=0.8) 
 
 windows()
@@ -1195,18 +1159,9 @@ text(1990,1.41,paste("Model mean: ",round(mean(stockModel_MW$VR_MH),3),sep = "")
 windows() 
 plot(summary_MW$Year[1:15], summary_MW$Con_Rate_MH[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(0,20),xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MH Con Rates, MW")
 lines(stockModel_MW$Year[1:15],stockModel_MW$Con_Rate_MH[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-# lines(mhs2yr$Year,50000*mhs2yr$MH2yr/summary_MW$Tot_HU_MH[1:15],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","MHS values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,2,paste("AHS mean: ",round(100*mean(summary_MW$Con_Rate_MH[1:15]),3),sep = ""))
 text(1995,1.5,paste("Model mean: ",round(mean(100*stockModel_MW$Con_Rate_MH[1:15]),3),sep = ""))
-# text(1995,1,paste("MHS mean: ",round(mean(50000*mhs2yr$MH2yr/summary_MW$Tot_HU_MH[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_MW$Year[1:15], 2*summary_MW$Dem_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,1e5),xlab = "Year",ylab = "MH Units removed every 2 years",main = "Model validation: Total MH Demolition. MW")
-# lines(summary_MW$Year[1:15],2*summary_MW$Demol_MH[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,4e5,paste("Total mean: ",2*round(mean(summary_MW$Dem_MH[1:15])),sep = ""))
-# text(1990,3.5e5,paste("Demol mean: ",2*round(mean(summary_MW$Demol_MH[1:15])),sep = ""))
 
 windows()
 plot(summary_MW$Year[1:15], 100*summary_MW$Dem_Rate_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MH Demolition Rates, MW")
@@ -1249,18 +1204,12 @@ text(2010,1.107,paste("Model mean: ",round(mean(stockModel_S$VR_SF),3),sep = "")
 windows() 
 plot(summary_S$Year[1:15], summary_S$Con_Rate_SF[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(0,5), xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: SF Con Rates, S")
 lines(stockModel_S$Year[1:15],stockModel_S$Con_Rate_SF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="South",]$Year,50000*con2yr[con2yr$Region=="South",]$SF2yr/summary_S$Tot_HU_SF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="South",]$Year,50000*con2yr[con2yr$Region=="South",]$SF2yr/summary_S$Tot_HU_SF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_S$Con_Rate_SF[1:15]),3),sep = ""))
 text(1995,0.6,paste("Model mean: ",round(mean(100*stockModel_S$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="South",]$SF2yr/summary_S$Tot_HU_SF[1:15]),3),sep = ""))
+text(1995,0.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="South",]$SF2yr/summary_S$Tot_HU_SF[1:16]),3),sep = ""))
 
-# windows()
-# plot(summary_S$Year[1:15], 2*summary_S$Dem_SF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,2e5),xlab = "Year",ylab = "SF Units removed every 2 years",main = "Model validation: Total SF Demolition. S")
-# lines(summary_S$Year[1:15],2*summary_S$Demol_SF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,6e5,paste("Total mean: ",2*round(mean(summary_S$Dem_SF[1:15])),sep = ""))
-# text(1990,5e5,paste("Demol mean: ",2*round(mean(summary_S$Demol_SF[1:15])),sep = ""))
 
 windows()
 plot(summary_S$Year[1:15], 100*summary_S$Dem_Rate_SF[1:15], type = "b",frame=FALSE, ylim=c(0.3,1), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: SF Demolition Rates, S")
@@ -1302,18 +1251,11 @@ text(1990,1.16,paste("Model mean: ",round(mean(stockModel_S$VR_MF),3),sep = ""))
 windows() 
 plot(summary_S$Year[1:15], summary_S$Con_Rate_MF[1:15]*100, type = "b",frame=FALSE,ylim=c(-0.9,5), pch=19,col="red",xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MF Con Rates, S")
 lines(stockModel_S$Year[1:15],stockModel_S$Con_Rate_MF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="South",]$Year,50000*con2yr[con2yr$Region=="South",]$MF2yr/summary_S$Tot_HU_MF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="South",]$Year,50000*con2yr[con2yr$Region=="South",]$MF2yr/summary_S$Tot_HU_MF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,4,paste("AHS mean: ",100*round(mean(summary_S$Con_Rate_MF[1:15]),4),sep = ""))
 text(1995,3.7,paste("Model mean: ",100*round(mean(stockModel_S$Con_Rate_MF[1:15]),4),sep = ""))
-text(1995,3.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="South",]$MF2yr/summary_S$Tot_HU_MF[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_S$Year[1:15], 2*summary_S$Dem_MF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,3e5),xlab = "Year",ylab = "MF Units removed every 2 years",main = "Model validation: Total MF Demolition. S")
-# lines(summary_S$Year[1:15],2*summary_S$Demol_MF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,2.7e5,paste("Total mean: ",2*round(mean(summary_S$Dem_MF[1:15])),sep = ""))
-# text(1990,2.5e5,paste("Demol mean: ",2*round(mean(summary_S$Demol_MF[1:15])),sep = ""))
+text(1995,3.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="South",]$MF2yr/summary_S$Tot_HU_MF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_S$Year[1:15], 100*summary_S$Dem_Rate_MF[1:15], type = "b",frame=FALSE, ylim=c(0.5,2), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MF Demolition Rates, S")
@@ -1336,37 +1278,27 @@ legend("topleft",legend = c("AHS values","Modeled values","AHS Occ. Units"),col=
 windows() # need to get regional MH shipment data
 plot(summary_S$Year[1:15], 2*summary_S$Con_MH_calc[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim=c(-.5e5,1e6),xlab = "Year",ylab = "New Man. Home Units every 2 years",main = "Model validation: Total MH Construction, S")
 lines(stockModel_S$Year[1:15],stockModel_S$Con_MH[1:15],col="blue",type = "b",lty=2,pch=18)
-# lines(mhs2yr$Year,1000*mhs2yr$MH2yr,col="forestgreen",type="b",pch=15,lty=1)
 lines(summary_S$Year[1:15],2*summary_S$Con_MH[1:15],col="gold3",type = "b",lty=2,pch=17)
 lines(summary_S$Year[1:15],rep(0,15),col="black",type = "l",lty=1)
-legend("topleft",legend = c("AHS apparent values","Modeled values","MHS data","AHS next-year values"),col=c("red","blue","forestgreen","gold"),lty=c(1,2,1,2),cex=0.75)
+legend("topleft",legend = c("AHS apparent values","Modeled values","AHS next-year values"),col=c("red","blue","gold"),lty=c(1,2,2),cex=0.75)
 text(1995,2e5,paste("AHS app. mean: ",2*round(mean(summary_S$Con_MH_calc[1:15])),sep = ""),cex=0.8)
 text(1995,1.6e5,paste("Model mean: ",round(mean(stockModel_S$Con_MH[1:15])),sep = ""),cex=0.8)
-# text(1995,1.2e5,paste("MHS mean: ",round(mean(1000*mhs2yr$MH2yr)),sep = ""),cex=0.8)
 text(1995,0.8e5,paste("AHS nxt-yr mean: ",2*round(mean(summary_S$Con_MH[1:15])),sep = ""),cex=0.8) 
 
 windows()
 plot(summary_S$Year, summary_S$VR_MH, type = "b",frame=FALSE, pch=19,col="red",xlab = "Year",ylab = "Vacancy Ratio",ylim=c(1.2,1.4), main = "Model validation: MH Vac Rates, S")
 lines(stockModel_S$Year,stockModel_S$VR_MH,col="blue",type = "b",lty=2,pch=18)
 legend("topleft",legend = c("AHS values","Modeled values"),col=c("red","blue"),lty=1:2,cex=0.75)
-text(1990,1.45,paste("AHS mean: ",round(mean(summary_S$VR_MH),3),sep = ""))
-text(1990,1.41,paste("Model mean: ",round(mean(stockModel_S$VR_MH),3),sep = ""))
+text(1990,1.35,paste("AHS mean: ",round(mean(summary_S$VR_MH),3),sep = ""))
+text(1990,1.33,paste("Model mean: ",round(mean(stockModel_S$VR_MH),3),sep = ""))
 
 windows() 
 plot(summary_S$Year[1:15], summary_S$Con_Rate_MH[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(0,15),xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MH Con Rates, S")
 lines(stockModel_S$Year[1:15],stockModel_S$Con_Rate_MH[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-# lines(mhs2yr$Year,50000*mhs2yr$MH2yr/summary_S$Tot_HU_MH[1:15],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","MHS values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,2,paste("AHS mean: ",round(100*mean(summary_S$Con_Rate_MH[1:15]),3),sep = ""))
 text(1995,1.5,paste("Model mean: ",round(mean(100*stockModel_S$Con_Rate_MH[1:15]),3),sep = ""))
-# text(1995,1,paste("MHS mean: ",round(mean(50000*mhs2yr$MH2yr/summary_S$Tot_HU_MH[1:15]),3),sep = ""))
 
-# windows()
-# plot(summary_S$Year[1:15], 2*summary_S$Dem_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,1e5),xlab = "Year",ylab = "MH Units removed every 2 years",main = "Model validation: Total MH Demolition. S")
-# lines(summary_S$Year[1:15],2*summary_S$Demol_MH[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,4e5,paste("Total mean: ",2*round(mean(summary_S$Dem_MH[1:15])),sep = ""))
-# text(1990,3.5e5,paste("Demol mean: ",2*round(mean(summary_S$Demol_MH[1:15])),sep = ""))
 
 windows()
 plot(summary_S$Year[1:15], 100*summary_S$Dem_Rate_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MH Demolition Rates, S")
@@ -1409,18 +1341,11 @@ text(2010,1.107,paste("Model mean: ",round(mean(stockModel_W$VR_SF),3),sep = "")
 windows() 
 plot(summary_W$Year[1:15], summary_W$Con_Rate_SF[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(0,4.5), xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: SF Con Rates, W")
 lines(stockModel_W$Year[1:15],stockModel_W$Con_Rate_SF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="West",]$Year,50000*con2yr[con2yr$Region=="West",]$SF2yr/summary_W$Tot_HU_SF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="West",]$Year,50000*con2yr[con2yr$Region=="West",]$SF2yr/summary_W$Tot_HU_SF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,0.8,paste("AHS mean: ",round(100*mean(summary_W$Con_Rate_SF[1:15]),3),sep = ""))
 text(1995,0.6,paste("Model mean: ",round(mean(100*stockModel_W$Con_Rate_SF[1:15]),3),sep = ""))
-text(1995,0.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="West",]$SF2yr/summary_W$Tot_HU_SF[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_W$Year[1:15], 2*summary_W$Dem_SF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,2e5),xlab = "Year",ylab = "SF Units removed every 2 years",main = "Model validation: Total SF Demolition. W")
-# lines(summary_W$Year[1:15],2*summary_W$Demol_SF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,6e5,paste("Total mean: ",2*round(mean(summary_W$Dem_SF[1:15])),sep = ""))
-# text(1990,5e5,paste("Demol mean: ",2*round(mean(summary_W$Demol_SF[1:15])),sep = ""))
+text(1995,0.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="West",]$SF2yr/summary_W$Tot_HU_SF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_W$Year[1:15], 100*summary_W$Dem_Rate_SF[1:15], type = "b",frame=FALSE, ylim=c(0.3,1), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: SF Demolition Rates, W")
@@ -1462,18 +1387,11 @@ text(1990,1.17,paste("Model mean: ",round(mean(stockModel_W$VR_MF),3),sep = ""))
 windows() 
 plot(summary_W$Year[1:15], summary_W$Con_Rate_MF[1:15]*100, type = "b",frame=FALSE,ylim=c(-0.9,5), pch=19,col="red",xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MF Con Rates, W")
 lines(stockModel_W$Year[1:15],stockModel_W$Con_Rate_MF[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-lines(con2yr[con2yr$Region=="West",]$Year,50000*con2yr[con2yr$Region=="West",]$MF2yr/summary_W$Tot_HU_MF[1:15],col="forestgreen",type="b",pch=15,lty=1)
+lines(con2yr[con2yr$Region=="West",]$Year,50000*con2yr[con2yr$Region=="West",]$MF2yr/summary_W$Tot_HU_MF[1:16],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","NRC values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,1.8,paste("AHS mean: ",100*round(mean(summary_W$Con_Rate_MF[1:15]),4),sep = ""))
 text(1995,1.6,paste("Model mean: ",100*round(mean(stockModel_W$Con_Rate_MF[1:15]),4),sep = ""))
-text(1995,1.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="West",]$MF2yr/summary_W$Tot_HU_MF[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_W$Year[1:15], 2*summary_W$Dem_MF[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,3e5),xlab = "Year",ylab = "MF Units removed every 2 years",main = "Model validation: Total MF Demolition. W")
-# lines(summary_W$Year[1:15],2*summary_W$Demol_MF[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,2.7e5,paste("Total mean: ",2*round(mean(summary_W$Dem_MF[1:15])),sep = ""))
-# text(1990,2.5e5,paste("Demol mean: ",2*round(mean(summary_W$Demol_MF[1:15])),sep = ""))
+text(1995,1.4,paste("NRC mean: ",round(mean(50000*con2yr[con2yr$Region=="West",]$MF2yr/summary_W$Tot_HU_MF[1:16]),3),sep = ""))
 
 windows()
 plot(summary_W$Year[1:15], 100*summary_W$Dem_Rate_MF[1:15], type = "b",frame=FALSE, ylim=c(0.2,1.5), pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MF Demolition Rates, W")
@@ -1496,13 +1414,11 @@ legend("topleft",legend = c("AHS values","Modeled values","AHS Occ. Units"),col=
 windows() # need to get regional MH shipment data
 plot(summary_W$Year[1:15], 2*summary_W$Con_MH_calc[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim=c(-.5e5,0.3e6),xlab = "Year",ylab = "New Man. Home Units every 2 years",main = "Model validation: Total MH Construction, W")
 lines(stockModel_W$Year[1:15],stockModel_W$Con_MH[1:15],col="blue",type = "b",lty=2,pch=18)
-# lines(mhs2yr$Year,1000*mhs2yr$MH2yr,col="forestgreen",type="b",pch=15,lty=1)
 lines(summary_W$Year[1:15],2*summary_W$Con_MH[1:15],col="gold3",type = "b",lty=2,pch=17)
 lines(summary_W$Year[1:15],rep(0,15),col="black",type = "l",lty=1)
 legend("topleft",legend = c("AHS apparent values","Modeled values","MHS data","AHS next-year values"),col=c("red","blue","forestgreen","gold"),lty=c(1,2,1,2),cex=0.75)
 text(2000,2e5,paste("AHS app. mean: ",2*round(mean(summary_W$Con_MH_calc[1:15])),sep = ""),cex=0.8)
 text(2000,1.8e5,paste("Model mean: ",round(mean(stockModel_W$Con_MH[1:15])),sep = ""),cex=0.8)
-# text(2000,1.6e5,paste("MHS mean: ",round(mean(1000*mhs2yr$MH2yr)),sep = ""),cex=0.8)
 text(2000,1.4e5,paste("AHS nxt-yr mean: ",2*round(mean(summary_W$Con_MH[1:15])),sep = ""),cex=0.8) 
 
 windows()
@@ -1515,18 +1431,9 @@ text(1990,1.31,paste("Model mean: ",round(mean(stockModel_W$VR_MH),3),sep = ""))
 windows() 
 plot(summary_W$Year[1:15], summary_W$Con_Rate_MH[1:15]*100, type = "b",frame=FALSE, pch=19,col="red",ylim=c(-2,10),xlab = "Year",ylab = "Construction Rate (%)",main = "Model validation: MH Con Rates, W")
 lines(stockModel_W$Year[1:15],stockModel_W$Con_Rate_MH[1:15]*100,col="blue",type = "b",lty=2,pch=18)
-# lines(mhs2yr$Year,50000*mhs2yr$MH2yr/summary_W$Tot_HU_MH[1:15],col="forestgreen",type="b",pch=15,lty=1)
 legend("topleft",legend = c("AHS values","Modeled values","MHS values"),col=c("red","blue","forestgreen"),lty=c(1,2,1),cex=0.75)
 text(1995,2,paste("AHS mean: ",round(100*mean(summary_W$Con_Rate_MH[1:15]),3),sep = ""))
 text(1995,1.5,paste("Model mean: ",round(mean(100*stockModel_W$Con_Rate_MH[1:15]),3),sep = ""))
-# text(1995,1,paste("MHS mean: ",round(mean(50000*mhs2yr$MH2yr/summary_W$Tot_HU_MH[1:15]),3),sep = ""))
-
-# windows()
-# plot(summary_W$Year[1:15], 2*summary_W$Dem_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",ylim = c(0,1e5),xlab = "Year",ylab = "MH Units removed every 2 years",main = "Model validation: Total MH Demolition. W")
-# lines(summary_W$Year[1:15],2*summary_W$Demol_MH[1:15], type = "b", pch=19,col="dimgray")
-# legend("topleft",legend = c("AHS total removals","AHS demolition only"),col=c("red","dimgray"),lty=1,cex=0.75)
-# text(1990,4e5,paste("Total mean: ",2*round(mean(summary_W$Dem_MH[1:15])),sep = ""))
-# text(1990,3.5e5,paste("Demol mean: ",2*round(mean(summary_W$Demol_MH[1:15])),sep = ""))
 
 windows()
 plot(summary_W$Year[1:15], 100*summary_W$Dem_Rate_MH[1:15], type = "b",frame=FALSE, pch=19,col="red",xlab = "Year",ylab = "Annual demolition rate (%)",main = "Model validation: MH Demolition Rates, W")

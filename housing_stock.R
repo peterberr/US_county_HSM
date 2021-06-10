@@ -1,17 +1,19 @@
 # script to make summaries of total and occupied housing stock in 2019 from ACS tables.
+# Peter Berrill February 2021
 # all tables accessed from data.census.gov
 rm(list=ls()) # clear workspace i.e. remove saved variables
 cat("\014") # clear console
 setwd("C:/Users/pb637/Documents/Yale Courses/Research/Final Paper/HSM_github")
 library(dplyr)
 
-stcd<-read.delim('~/Yale Courses/Research/US Housing/statecodes.txt', header = TRUE, sep = "|")
+stcd<-read.delim('Data/statecodes.txt', header = TRUE, sep = "|")
 stcd<-stcd[,1:3] # keep only state abbreviation and state name
 colnames(stcd)<-c("STATE_ID","STUSAB","STATE_NAME")
 
 # get data for total housing stock from DP04 1-yr, 5-yr, and 1-yr state tables  ###############
 # accessed from data.census.gov
-htot2019<-read.csv("~/Yale Courses/Research/US Housing/ACS/DP04_2019/ACSDP5Y2019.DP04_data_with_overlays_2020-12-20T002309.csv") # 5 year version, with data for all counties
+# ACS Table DP04 5 year version, with data for all counties
+htot2019<-read.csv("~/Yale Courses/Research/US Housing/ACS/DP04_2019/ACSDP5Y2019.DP04_data_with_overlays_2020-12-20T002309.csv") 
 htot2019$id<-substr(htot2019$GEO_ID,nchar(htot2019$GEO_ID)-4,nchar(htot2019$GEO_ID))
 htot2019$StID<-substr(htot2019$id,1,2)
 # remove margins of error and percentages
@@ -338,7 +340,6 @@ ho19t<-ho19t[,c(1:4,91:111)]
 names(ho19t)[4]<-"Tot_OU"
 # save occupied housing stock df
 save(ho19t,file= 'Intermediate_results/OccHousing2019.RData')
-# write.csv(ho19t,'OccHousStock2019new.csv')
 
 # finally add the data on occupied homes by T-C nested to the df (h18) of total homes by type and cohort separately
 h19[,15:33]<-ho19t[,4:22]
@@ -494,8 +495,4 @@ h19tb_new[,16:42]<-round(h19tb_new[,16:42]) # get rid of decimal places
 # # sum, this is for later when I am finalzing the number of occupied houses. If occupied>total, occupied <- total
 h19tb_new$TotSumUnits<-h19tb_new$Cpre40Sum+h19tb_new$C4059Sum+h19tb_new$C6079Sum+h19tb_new$C8099Sum+h19tb_new$C2000Sum+h19tb_new$C2010Sum
 h19tb_new$CheckSum<-h19tb_new$TotSumUnits/h19tb_new$Total_HU # compare the cohort sum with the reported total sum
-# just to make sure, but should already be dealt with above
-# h19tb_new[h19tb_new$GeoID==35013,]$`County,State`<-"Dona Ana County, New Mexico"
-# h19tb_new[h19tb_new$GeoID==22059,]$`County,State`<-"La Salle Parish, Louisiana"
 save(h19tb_new,file= "Intermediate_results/TotalHousing2019.RData")
-# write.csv(h19tb_new,'TotHousStock2019new.csv')

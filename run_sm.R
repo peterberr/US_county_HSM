@@ -1,4 +1,4 @@
-run_sm <- function(stockModel) { # begin large function of stock model
+run_sm <- function(stockModel) { # function to run stock model
   for (i in 1:(dim(stockModel)[1]-1)) {
     # within loop
     ## step 2. calculate demolition rates by age cohort, remember these are demolition over two years, as we converted the demolition rates as such
@@ -280,4 +280,4 @@ run_sm <- function(stockModel) { # begin large function of stock model
     
   } 
   stockModel
-} # end of large stock model function
+} # end of stock model function

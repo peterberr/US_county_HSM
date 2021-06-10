@@ -1,5 +1,5 @@
 # script to run housing stock model projections for all US counties, 2020-2060
-# Last updated Feb 17 2021
+# Peter Berrill Feb 2021
 rm(list=ls()) # clear workspace i.e. remove saved variables
 cat("\014") # clear console
 setwd("~/Yale Courses/Research/Final Paper/HSM_github/")

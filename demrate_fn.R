@@ -1,26 +1,19 @@
-# figuring out demolition rates for cohorts based on demolition rates for age ranges
-# Oct 31 2020
+# Calculate demolition rates for cohorts based on demolition rates for age ranges
+# Peter Berrill Jan 2021
 
 # this function takes an input of a data frame with stock by cohorts in columns, with a given year, and returns the same data frame
 # with additional columns indicating the demolition rate of each cohort, based on exogenous demolition rates by age ranges.
 
 demrate_fn <- function(yr0,stock,dem_rates) {
   library(reshape2)
-# stock<-data.frame(Year=1985,'1890.1939'=40,'1940.1959'=30,'1960.1979'=20,'1980.1999'=10,'2000.2009'=0)
-# yr<-stock$Year
-  # s2<-melt(stock) # set about defining something equivalent to s below, given the input stock data as a row.
-  # colnames(s2)<-c("Cohort","Units")
   s2<-data.frame("Cohort"=names(stock),"Units"=as.numeric(stock))
   s2$Year<-yr0+1
   s2$Cohort<-as.character(s2$Cohort)
-  # s2$Cohort<-substr(s2$Cohort,2,10) # remove leading "X"
 
   s2$ar0.19<-s2$ar20.59<-s2$ar60<-s2$pc0.19<-s2$pc20.59<-s2$pc60<-s2$dem_rate_wtd<-0
-  # s<-data.frame(Year=1985,Cohort=c("1890.1939","1940.1959","1960.1979","1980.1999"),Units=c(40,30,20,10),
-  #               'ar0.19'=0,'ar20.59'=0, 'ar60'=0,'pc0.19'=0,'pc20.59'=0, 'pc60'=0,'dem_rate_wtd'=0)
+
   s<-s2
   cohorts<-unique(s$Cohort)
-  # dem_rates<-c(0,0.005,0.015) # demolition rates for the 0-19, 20-59, and 60+ age ranges
   
   # looped condensed code
   for (k in 1:length(cohorts)) {
@@ -32,12 +25,6 @@ demrate_fn <- function(yr0,stock,dem_rates) {
     
     s[s$Cohort==cohorts[k],]$dem_rate_wtd<-sum(as.numeric(s[s$Cohort==cohorts[k],c('pc0.19','pc20.59','pc60')])*dem_rates,na.rm = TRUE)
   }
-  # p<-paste('dem_rate',cohorts[k],sep = "_")
-  # send the demolition rates back to 'stock'
-  # stock$dr_1<-s$dem_rate_wtd[1]
-  # stock$dr_2<-s$dem_rate_wtd[2]
-  # stock$dr_3<-s$dem_rate_wtd[3]
-  # stock$dr_4<-s$dem_rate_wtd[4]
   # demolition rates by cohort group
   op<-as.data.frame(matrix(s$dem_rate_wtd,1,length(cohorts)))
   names(op)<-paste('dr',cohorts,sep = '_')
@@ -46,33 +33,3 @@ demrate_fn <- function(yr0,stock,dem_rates) {
   op
 
 }
-# stockOp<-merge(stock,op,by="Year")
-
-# for (i in 1:(dim(stock)[2]-1))
-
-# long-hand code
-# s[s$Cohort=='1890.1939',]$ar0.19<-length(intersect(seq(1890,1939),seq(s[s$Cohort=='1890.1939',]$Year-19,s[s$Cohort=='1890.1939',]$Year)))
-# s[s$Cohort=='1940.1959',]$ar0.19<-length(intersect(seq(1940,1959),seq(s[s$Cohort=='1940.1959',]$Year-19,s[s$Cohort=='1940.1959',]$Year)))
-# s[s$Cohort=='1960.1979',]$ar0.19<-length(intersect(seq(1960,1979),seq(s[s$Cohort=='1960.1979',]$Year-19,s[s$Cohort=='1960.1979',]$Year)))
-# s[s$Cohort=='1980.1999',]$ar0.19<-length(intersect(seq(1980,1999),seq(s[s$Cohort=='1980.1999',]$Year-19,s[s$Cohort=='1980.1999',]$Year)))
-# 
-# s[s$Cohort=='1890.1939',]$ar20.59<-length(intersect(seq(1890,1939),seq(s[s$Cohort=='1890.1939',]$Year-59,s[s$Cohort=='1890.1939',]$Year-20)))
-# s[s$Cohort=='1940.1959',]$ar20.59<-length(intersect(seq(1940,1959),seq(s[s$Cohort=='1940.1959',]$Year-59,s[s$Cohort=='1940.1959',]$Year-20)))
-# s[s$Cohort=='1960.1979',]$ar20.59<-length(intersect(seq(1960,1979),seq(s[s$Cohort=='1960.1979',]$Year-59,s[s$Cohort=='1960.1979',]$Year-20)))
-# s[s$Cohort=='1980.1999',]$ar20.59<-length(intersect(seq(1980,1999),seq(s[s$Cohort=='1980.1999',]$Year-59,s[s$Cohort=='1980.1999',]$Year-20)))
-# 
-# s[s$Cohort=='1890.1939',]$ar60<-length(intersect(seq(1890,1939),seq(1890,s[s$Cohort=='1890.1939',]$Year-60)))
-# s[s$Cohort=='1940.1959',]$ar60<-length(intersect(seq(1940,1959),seq(1890,s[s$Cohort=='1940.1959',]$Year-60)))
-# s[s$Cohort=='1960.1979',]$ar60<-length(intersect(seq(1960,1979),seq(1890,s[s$Cohort=='1960.1979',]$Year-60)))
-# s[s$Cohort=='1980.1999',]$ar60<-length(intersect(seq(1980,1999),seq(1890,s[s$Cohort=='1980.1999',]$Year-60)))
-
-# s[s$Cohort=='1890.1939',c('pc0.19','pc20.59','pc60')]<-s[s$Cohort=='1890.1939',c('ar0.19','ar20.59','ar60')]/sum(s[s$Cohort=='1890.1939',c('ar0.19','ar20.59','ar60')])
-# s[s$Cohort=='1940.1959',c('pc0.19','pc20.59','pc60')]<-s[s$Cohort=='1940.1959',c('ar0.19','ar20.59','ar60')]/sum(s[s$Cohort=='1940.1959',c('ar0.19','ar20.59','ar60')])
-# s[s$Cohort=='1960.1979',c('pc0.19','pc20.59','pc60')]<-s[s$Cohort=='1960.1979',c('ar0.19','ar20.59','ar60')]/sum(s[s$Cohort=='1960.1979',c('ar0.19','ar20.59','ar60')])
-# s[s$Cohort=='1980.1999',c('pc0.19','pc20.59','pc60')]<-s[s$Cohort=='1980.1999',c('ar0.19','ar20.59','ar60')]/sum(s[s$Cohort=='1980.1999',c('ar0.19','ar20.59','ar60')])
-
-
-# s[s$Cohort=='1890.1939',]$dem_rate_wtd<-sum(as.numeric(s[s$Cohort=='1890.1939',c('pc0.19','pc20.59','pc60')])*dem_rates,na.rm = TRUE)
-# s[s$Cohort=='1940.1959',]$dem_rate_wtd<-sum(as.numeric(s[s$Cohort=='1940.1959',c('pc0.19','pc20.59','pc60')])*dem_rates,na.rm = TRUE)
-# s[s$Cohort=='1960.1979',]$dem_rate_wtd<-sum(as.numeric(s[s$Cohort=='1960.1979',c('pc0.19','pc20.59','pc60')])*dem_rates,na.rm = TRUE)
-# s[s$Cohort=='1980.1999',]$dem_rate_wtd<-sum(as.numeric(s[s$Cohort=='1980.1999',c('pc0.19','pc20.59','pc60')])*dem_rates,na.rm = TRUE)

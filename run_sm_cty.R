@@ -1,4 +1,4 @@
-run_sm_cty <- function(stockModel) { # begin large function of stock model
+run_sm_cty <- function(stockModel) { # begin  function of stock model for individual county
   for (i in 1:(dim(stockModel)[1]-1)) {
   # for (i in 1:15) {
     # within loop
@@ -437,4 +437,4 @@ run_sm_cty <- function(stockModel) { # begin large function of stock model
     
   } 
   stockModel
-} # end of large stock model function
+} # end of county stock model function

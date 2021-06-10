@@ -1,8 +1,8 @@
-# figuring out demolition rates for cohorts based on demolition rates for age ranges
-# Nov 12 2020
+# Function to calculate vacancy rates for cohorts based on vacancy rates for age ranges
+# Peter Berrill Jan 2021
 
 # this function takes an input of a data frame with stock by cohorts in columns, with a given year, and returns the same data frame
-# with additional columns indicating the demolition rate of each cohort, based on exogenous demolition rates by age ranges.
+# with additional columns indicating the vacancy rate of each cohort, based on exogenous vacancy rates by age ranges.
 
 vacrate_fn <- function(yr1,vacstock,dem_adj,isMH) {
   library(reshape2)

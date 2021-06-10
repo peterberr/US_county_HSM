@@ -1,4 +1,5 @@
 ## script to extract, interpret, and visualise results from county housing stock model
+# Peter Berrill March 2021
 library(ggplot2)
 library(dplyr)
 library(reshape2)
@@ -35,10 +36,7 @@ for (r in 1:3142) {
                              smop_base[[3]][[r]]$Tot_HU_MH[1]*(smop_base[[3]][[r]]$pcTot_HU_MH_Occ_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Vac_p1940[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Occ_1940_59[1]+smop_base[[3]][[r]]$pcTot_HU_MH_Vac_1940_59[1])
   smop_base$tot_HU[r]<-smop_base[[3]][[r]]$Tot_Hous_Units[1]
 }
-# (sb$Tot_HU_SF[1]*(sb$pcTot_HU_SF_Occ_p1940[1]+sb$pcTot_HU_SF_Vac_p1940[1]+sb$pcTot_HU_SF_Occ_1940_59[1]+sb$pcTot_HU_SF_Vac_1940_59[1])+
-#   sb$Tot_HU_MF[1]*(sb$pcTot_HU_MF_Occ_p1940[1]+sb$pcTot_HU_MF_Vac_p1940[1]+sb$pcTot_HU_MF_Occ_1940_59[1]+sb$pcTot_HU_MF_Vac_1940_59[1])+
-#   sb$Tot_HU_MH[1]*(sb$pcTot_HU_MH_Occ_p1940[1]+sb$pcTot_HU_MH_Vac_p1940[1]+sb$pcTot_HU_MH_Occ_1940_59[1]+sb$pcTot_HU_MH_Vac_1940_59[1]))/sb$Tot_Hous_Units[1]
-  
+
 summ_base<-smop_base[,-3]    # summary of stock changes, base scenario
 # identify counties with strong and sustained population decline
 sbs<-summ_base[order(summ_base$PopGrowthRel),][1:35,] # summ base sort
@@ -102,22 +100,6 @@ for (r in 1:3142) {
 }
 summ_hiDR<-smop_hiDR[,-3]    # summary of stock changes, hiDR scenario
 
-# # now some rankings to compare between scenarios, can be ommitted other than Baseline
-# hiSGrowth_hiDR<-summ_hiDR[order(-summ_hiDR$SGrowthAbs),][1:35,]
-# # where is reduction in vacancy rate most apparent/needed?
-# hiSGrowth_hiDR<-hiSGrowth_hiDR[order(-hiSGrowth_hiDR$VFGrowthAbs),] # Austin TX (Travis County),Atlanta GA suburbs, DC, Minneapolis, FWD TX suburbs, San Antonio, Dallas, Houston TX, Charlotte NC, Bronx, Boston,  Denver,  Oakland (SF suburbs), Seattle, San Jose CA
-# 
-# # where is increase in vacancy rate most acute? This will pick out declining counties
-# hiVFGrowth_hiDR<-summ_hiDR[order(-summ_hiDR$VFGrowthAbs),][1:35,]
-# # remove rows with del population absolute value less than 5,000
-# hiVFGrowth_hiDR<-hiVFGrowth_hiDR[-c(which(hiVFGrowth_hiDR$PopGrowthAbs>-5000)),] # San Juan NM, Moffat CO, Aroostook Maine, Cambria PA
-# 
-# # Where is growth in MF most? ALL of these see their vacancy rate reduced. Especially Bronx, Denver, Seattle
-# hiMFGrowth_hiDR<-summ_hiDR[order(-summ_hiDR$MFGrowthAbs),][1:35,] # Houston TX, Seattle, Manhattan, LA, Phoenix, Brooklyn, Dallas, Austin, Bronx, SF, Miami, DC, Denver
-# 
-# # where is demolition greatest? will pick out places which currently have larege (and old) housing stocks.
-# hiDem_hiDR<-summ_hiDR[order(-summ_hiDR$DemTot),][1:35,] # big cities: LA, Houston, Chicago, Phoenix, Miami, Dallas, SD, Fort Lauderdale, NY city, Fort Worth
-
 smop_hiMF<-as.data.frame(smop_hiMF)
 smop_hiMF$PopGrowthRel<-1
 smop_hiMF$PopGrowthAbs<-0
@@ -139,22 +121,6 @@ for (r in 1:3142) {
   smop_hiMF$DemTot[r]<-sum(smop_hiMF[[3]][[r]][,26:28])
 }
 summ_hiMF<-smop_hiMF[,-3]    # summary of stock changes, hiMF scenario
-
-# # now some rankings to compare between scenarios, can be ommitted other than Baseline
-# hiSGrowth_hiMF<-summ_hiMF[order(-summ_hiMF$SGrowthAbs),][1:35,]
-# # where is reduction in vacancy rate most apparent/needed?
-# hiSGrowth_hiMF<-hiSGrowth_hiMF[order(-hiSGrowth_hiMF$VFGrowthAbs),] # Austin TX (Travis County),Atlanta GA suburbs, DC, Minneapolis, FWD TX suburbs, San Antonio, Dallas, Houston TX, Charlotte NC, Bronx, Boston,  Denver,  Oakland (SF suburbs), Seattle, San Jose CA
-# 
-# # where is increase in vacancy rate most acute? This will pick out declining counties
-# hiVFGrowth_hiMF<-summ_hiMF[order(-summ_hiMF$VFGrowthAbs),][1:35,]
-# # remove rows with del population absolute value less than 5,000
-# hiVFGrowth_hiMF<-hiVFGrowth_hiMF[-c(which(hiVFGrowth_hiMF$PopGrowthAbs>-5000)),] # San Juan NM, Moffat CO, Aroostook Maine, Cambria PA
-# 
-# # Where is growth in MF most? ALL of these see their vacancy rate reduced. Especially Bronx, Denver, Seattle
-# hiMFGrowth_hiMF<-summ_hiMF[order(-summ_hiMF$MFGrowthAbs),][1:35,] # Houston TX, Seattle, Manhattan, LA, Phoenix, Brooklyn, Dallas, Austin, Bronx, SF, Miami, DC, Denver
-# 
-# # where is demolition greatest? will pick out places which currently have larege (and old) housing stocks.
-# hiDem_hiMF<-summ_hiMF[order(-summ_hiMF$DemTot),][1:35,] # big cities: LA, Houston, Chicago, Phoenix, Miami, Dallas, SD, Fort Lauderdale, NY city, Fort Worth
 
 smop_hiDRMF<-as.data.frame(smop_hiDRMF)
 smop_hiDRMF$PopGrowthRel<-1
@@ -178,22 +144,6 @@ for (r in 1:3142) {
 }
 summ_hiDRMF<-smop_hiDRMF[,-3]    # summary of stock changes, hiDRMF scenario
 
-# # now some rankings to compare between scenarios, can be ommitted other than Baseline
-# hiSGrowth_hiDRMF<-summ_hiDRMF[order(-summ_hiDRMF$SGrowthAbs),][1:35,]
-# # where is reduction in vacancy rate most apparent/needed?
-# hiSGrowth_hiDRMF<-hiSGrowth_hiDRMF[order(-hiSGrowth_hiDRMF$VFGrowthAbs),] # Austin TX (Travis County),Atlanta GA suburbs, DC, Minneapolis, FWD TX suburbs, San Antonio, Dallas, Houston TX, Charlotte NC, Bronx, Boston,  Denver,  Oakland (SF suburbs), Seattle, San Jose CA
-# 
-# # where is increase in vacancy rate most acute? This will pick out declining counties
-# hiVFGrowth_hiDRMF<-summ_hiDRMF[order(-summ_hiDRMF$VFGrowthAbs),][1:35,]
-# # remove rows with del population absolute value less than 5,000
-# hiVFGrowth_hiDRMF<-hiVFGrowth_hiDRMF[-c(which(hiVFGrowth_hiDRMF$PopGrowthAbs>-5000)),] # San Juan NM, Moffat CO, Aroostook Maine, Cambria PA
-# 
-# # Where is growth in MF most? ALL of these see their vacancy rate reduced. Especially Bronx, Denver, Seattle
-# hiMFGrowth_hiDRMF<-summ_hiDRMF[order(-summ_hiDRMF$MFGrowthAbs),][1:35,] # Houston TX, Seattle, Manhattan, LA, Phoenix, Brooklyn, Dallas, Austin, Bronx, SF, Miami, DC, Denver
-# 
-# # where is demolition greatest? will pick out places which currently have larege (and old) housing stocks.
-# hiDem_hiDRMF<-summ_hiDRMF[order(-summ_hiDRMF$DemTot),][1:35,] # big cities: LA, Houston, Chicago, Phoenix, Miami, Dallas, SD, Fort Lauderdale, NY city, Fort Worth
-
 ## load in intial housing stock data for 2020
 load("Intermediate_results/InitStock20.RData")
 st_reg<-read.csv('Data/state-geocodes-v2017.csv')
@@ -213,13 +163,11 @@ stcd<-stcd[,1:3] # keep only state abbreviation and state name
 colnames(stcd)<-c("STATE_ID","STUSAB","STATE_NAME")
 st<-merge(st_reg,stcd,by.x = "State_FIPS",by.y = "STATE_ID")
 
-# smop_base$County.StateAbb<-smop_base$County.State
 codes$County.StateAbb<-codes$County.State
 for (j in 1:51) {
-  # smop_base$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],smop_base$County.StateAbb) # unnecessary
   codes$County.StateAbb<-gsub(st$Name[j],st$STUSAB[j],codes$County.StateAbb)
 }
-# calculate and visualize stock growth vs % pre-1960 ########### not very impressive graph at county level
+# calculate and visualize stock growth vs % pre-1960 ########### 
 fit <- lm(PopGrowthRel~pc_pre60, data=summ_base)
 windows()
 plot(summ_base$pc_pre60,summ_base$PopGrowthRel)
@@ -249,37 +197,6 @@ p + geom_point(col="cadetblue") + geom_text(hjust=0,nudge_x=0.005) + geom_line(d
   scale_y_continuous(labels = scales::percent,breaks = c(-0.2,0,0.2, 0.4, 0.6,0.8,1)) +  scale_x_continuous(labels = scales::percent,limits = c(0.045, 0.6),breaks=c(0.1,0.2,0.3,0.4,0.5,0.6)) +
   labs(title = "Projected Stock Growth vs 2020 Stock Age Profile",y= "Relative Housing Stock Growth, 2020-2060",x="Percent of 2020 Stock Built Pre-1960") + theme_bw() +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 14, face = "bold"))
-
-load("../StockModelCode/buildstock100.RData")
-czs<-as.data.frame(table(rs$State,rs$Building.America.Climate.Zone))
-czs<-czs[czs$Freq>0,]
-names(czs)[1:2]<-c("State","CZ")
-rownames(czs)<-1:nrow(czs)
-
-czs$CZ<-as.character(czs$CZ)
-czs2<-data.frame(State=unique(czs$State),CZ="NA",Freq=0)
-for (i in 1: nrow(czs2)) {
-  czs2[i,]<-czs[which(czs$Freq==max(czs[czs$State==czs2[i,]$State,]$Freq)),]
-}
-czse<-data.frame(State=c("AK","HI"),CZ=c("Very Cold","Hot-Humid"),Freq=c(0,0))
-czs2<-rbind(czs2,czse)
-stsum<-merge(stsum,czs2)
-
-stsum[stsum$CZ=="Hot-Humid",]$CZ<-"1. Hot-Humid"
-stsum[stsum$CZ %in% c("Hot-Dry","Mixed-Dry"), ]$CZ<-"2. Hot/Mixed-Dry"
-stsum[stsum$CZ=="Marine",]$CZ<-"3. Marine"
-stsum[stsum$CZ=="Mixed-Humid",]$CZ<-"4. Mixed-Humid"
-stsum[stsum$CZ %in% c("Cold","Very Cold"),]$CZ<-"5. Cold/Very Cold"
-# stsum[stsum$CZ=="Very Cold",]$CZ<-"6. Very Cold"
-
-
-windows()
-p<-ggplot(stsum,aes(pre60Rel,StockGrowthRel,label=State))
-p + geom_point(aes(col=CZ)) + geom_text(hjust=0,nudge_x=0.005) + geom_line(data=stsum2,aes(pre60Rel,fit2),col="brown2",size=1) +
-  scale_y_continuous(labels = scales::percent,breaks = c(-0.2,0,0.2, 0.4, 0.6,0.8,1)) +  scale_x_continuous(labels = scales::percent,limits = c(0.045, 0.6),breaks=c(0.1,0.2,0.3,0.4,0.5,0.6)) +
-  labs(title = "Projected Stock Growth vs 2020 Stock Age Profile",y= "Relative Housing Stock Growth, 2020-2060",x="Percent of 2020 Stock Built Pre-1960") + theme_bw() +
-  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 14, face = "bold")) +
-  scale_color_manual(values=as.vector(warmcool(7))) # need a package for this 
 
 # extract template for making US summary results, for each scenario ##########
 us_base<-as.data.frame(smop_base[[3]][[1]][,c(1:31,110:169)])
@@ -396,8 +313,8 @@ us_hiDRMF[,18:21]<-us_hiDRMF[,22:25]/us_hiDRMF[,14:17]
 # calculate addition (con) and loss (dem) rates
 us_hiDRMF[,c("Con_Rate_SF","Con_Rate_MF","Con_Rate_MH")]<-us_hiDRMF[,c("Con_SF","Con_MF","Con_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
 us_hiDRMF[,c("Dem_Rate_SF","Dem_Rate_MF","Dem_Rate_MH")]<-us_hiDRMF[,c("Dem_SF","Dem_MF","Dem_MH")]/us_hiDRMF[,c("Tot_HU_SF","Tot_HU_MF","Tot_HU_MH")]
-# save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="Summary_results/US_smop_scenarios.RData")
-load("HSM_results/US_smop_scenarios.RData")
+save(us_base,us_hiDR,us_hiMF,us_hiDRMF,file="HSM_results/US_smop_scenarios.RData")
+# load("HSM_results/US_smop_scenarios.RData")
 # figure out how many occupied new constructions exist every 5 years for each scenario ##############
 new_OU_base<-us_base[c(seq(1,41,5)),c(2,38:41,58:61,78:81)] # extract columns of Year, and Tot occupied units by type and new cohort
 new_OU_base$Tot_New_OU<-0
@@ -656,38 +573,6 @@ SF_Coh_hiDRMF
 
 MF_Coh_base
 MF_Coh_hiDRMF
-# 
-# emf('Figures/Files for AI/Orig_emf/fig4_1.emf',width = 6.415, height = 5.415)
-# SF_Coh_base
-# dev.off()
-# 
-# emf('Figures/Files for AI/Orig_emf/fig4_2.emf',width = 6.415, height = 5.415)
-# SF_Coh_hiDRMF
-# dev.off()
-# 
-# emf('Figures/Files for AI/Orig_emf/fig4_3.emf',width = 6.415, height = 5.415)
-# MF_Coh_base
-# dev.off()
-# 
-# emf('Figures/Files for AI/Orig_emf/fig4_4.emf',width = 6.415, height = 5.415)
-# MF_Coh_hiDRMF
-# dev.off()
-
-tiff("Figures/Files for AI/Original Tiff/fig3_1.tiff", units="in", width=6.415, height=5.415,res=300)
-SF_Coh_base
-dev.off()
-
-tiff("Figures/Files for AI/Original Tiff/fig3_2.tiff", units="in", width=6.415, height=5.415,res=300)
-SF_Coh_hiDRMF
-dev.off()
-
-tiff("Figures/Files for AI/Original Tiff/fig3_3.tiff", units="in", width=6.415, height=5.415,res=300)
-MF_Coh_base
-dev.off()
-
-tiff("Figures/Files for AI/Original Tiff/fig3_4.tiff", units="in", width=6.415, height=5.415,res=300)
-MF_Coh_hiDRMF
-dev.off()
 
 # now make graphs for individual counties ###############
 smop_scenarios<-c("smop_base","smop_hiDR","smop_hiMF","smop_hiDRMF")
@@ -862,38 +747,6 @@ g<-ggplot(tc_mh,aes(x=Year,y=0.001*Stock,fill=reorder(Cohort,order)))+geom_area(
 }
 }
 # now make some multiplots ##########
-# vacancy factors
-windows()
-multiplot(VacRate48201_base+ theme(axis.title.x=element_blank(),legend.position = "none")+labs(y="Vac Rate")+scale_y_continuous(limits = c(0,0.23), labels = scales::percent_format(accuracy = 1)),
-          VacRate35045_base+ theme(legend.position = "none")+labs(y="Vac Rate")+scale_y_continuous(limits = c(0,0.6), labels = scales::percent_format(accuracy = 1)),
-          VacRate44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none")+scale_y_continuous(limits = c(0,0.23), labels = scales::percent_format(accuracy = 1)),
-          VacRate26103_base+ theme(axis.title.y=element_blank(),legend.position = "none")+scale_y_continuous(limits = c(0,0.6), labels = scales::percent_format(accuracy = 1)),cols=2)
-
-# just base, four counties population, one plot
-windows()
-multiplot(Pop48201_base+ theme(axis.title.x=element_blank(),legend.position = "none"),
-          Pop35045_base+ theme(legend.position = "none"),
-          Pop44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none"),
-          Pop26103_base+ theme(axis.title.y=element_blank(),legend.position = "none"),cols=2)
-
-# just base, four counties, one plot
-windows()
-multiplot(ConDemRate48201_base+ theme(legend.position = "none",axis.title.x=element_blank())+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.065), labels = scales::percent),
-          ConDemRate35045_base+ theme(legend.position = "none")+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.046), labels = scales::percent),
-          ConDemRate44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none")+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.046), labels = scales::percent),
-          ConDemRate26103_base+theme(axis.title.y=element_blank(),legend.position = "none")+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.046), labels = scales::percent),cols=2)
-
-# just base, four counties, one plot, MF Cohorts. This looks better if individual plots are pasted together in the word doc
-windows()
-multiplot(MF_Coh48201_base+ theme(legend.position = "none",axis.title.x=element_blank()),MF_Coh35045_base+ theme(legend.position = "none"),
-          MF_Coh44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none"),MF_Coh26103_base+theme(axis.title.y=element_blank(),legend.position = "none"),cols=2)
-
-# check all stock model outputs for all scenarios for a given county, defined by rowname of smop data frames
-rn<-1820
-cty_df1<-as.data.frame(smop_base[[3]][[rn]])
-cty_df2<-as.data.frame(smop_hiDR[[3]][[rn]])
-cty_df3<-as.data.frame(smop_hiMF[[3]][[rn]])
-cty_df4<-as.data.frame(smop_hiDRMF[[3]][[rn]])
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
   
@@ -929,3 +782,29 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+
+# vacancy factors
+windows()
+multiplot(VacRate48201_base+ theme(axis.title.x=element_blank(),legend.position = "none")+labs(y="Vac Rate")+scale_y_continuous(limits = c(0,0.23), labels = scales::percent_format(accuracy = 1)),
+          VacRate35045_base+ theme(legend.position = "none")+labs(y="Vac Rate")+scale_y_continuous(limits = c(0,0.6), labels = scales::percent_format(accuracy = 1)),
+          VacRate44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none")+scale_y_continuous(limits = c(0,0.23), labels = scales::percent_format(accuracy = 1)),
+          VacRate26103_base+ theme(axis.title.y=element_blank(),legend.position = "none")+scale_y_continuous(limits = c(0,0.6), labels = scales::percent_format(accuracy = 1)),cols=2)
+
+# just base, four counties population, one plot
+windows()
+multiplot(Pop48201_base+ theme(axis.title.x=element_blank(),legend.position = "none"),
+          Pop35045_base+ theme(legend.position = "none"),
+          Pop44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none"),
+          Pop26103_base+ theme(axis.title.y=element_blank(),legend.position = "none"),cols=2)
+
+# just base, four counties, one plot
+windows()
+multiplot(ConDemRate48201_base+ theme(legend.position = "none",axis.title.x=element_blank())+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.065), labels = scales::percent),
+          ConDemRate35045_base+ theme(legend.position = "none")+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.046), labels = scales::percent),
+          ConDemRate44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none")+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.046), labels = scales::percent),
+          ConDemRate26103_base+theme(axis.title.y=element_blank(),legend.position = "none")+labs(y="Add, Loss Rates")+scale_y_continuous(limits = c(0,0.046), labels = scales::percent),cols=2)
+
+# just base, four counties, one plot, MF Cohorts. 
+windows()
+multiplot(MF_Coh48201_base+ theme(legend.position = "none",axis.title.x=element_blank()),MF_Coh35045_base+ theme(legend.position = "none"),
+          MF_Coh44007_base+ theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position = "none"),MF_Coh26103_base+theme(axis.title.y=element_blank(),legend.position = "none"),cols=2)

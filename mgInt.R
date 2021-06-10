@@ -1,4 +1,5 @@
 # script to read in and characterize material and GHG intensities of housing archetypes
+# Peter Berrill April 2021
 rm(list=ls()) # clear workspace i.e. remove saved variables
 cat("\014") # clear console
 library(dplyr)
@@ -6,24 +7,25 @@ library(reshape2)
 library(readxl)
 library(ggplot2)
 setwd("~/Yale Courses/Research/Final Paper/HSM_github")
-conc<-read.csv("~/Yale Courses/Research/US Housing/Athena MI Archetypes/MatCon.csv")
+conc<-read.csv("Housing Archetypes/MatCon.csv")
 conc<-conc[order(conc$Material),]
 names(conc)<-gsub('\\.\\.',', ', names(conc))
 names(conc)<-gsub('\\.',' ', names(conc))
-agg<-read.csv("~/Yale Courses/Research/US Housing/Athena MI Archetypes/MatAgg.csv")
+agg<-read.csv("Housing Archetypes/MatAgg.csv")
 names(agg)[c(10,12)]<-c("Sand/Aggregate","Transport/Construction")
-gi<-read_excel("~/Yale Courses/Research/US Housing/Athena MI Archetypes/MatGHGint.xlsx",sheet = "Data")
-load("~/Yale Courses/Research/US Housing/SOC/framing.RData")
+gi<-read_excel("Housing Archetypes/MatGHGint.xlsx",sheet = "Data")
+# share of new single-family built with wood/masonry framing, based on Survey of Construction microdata https://www.census.gov/construction/chars/microdata.html
+load("Data/framing.RData")
 MatList<-conc$Material
 MatTemp<-data.frame(Material=MatList,Mass = 0)
 agg<-agg[order(agg$Material),]
 
-# try in a loop now ####
+# try in a loop  ####
 for (a in c(1:48,59,60)) {
 # for (a in c(1:33)) {
   for (b in 1:4) {
-fn<-paste("~/Yale Courses/Research/US Housing/Athena MI Archetypes/Bill of Materials Report ",a, ".", b, ".xlsx",sep="")
-fn2<-paste("~/Yale Courses/Research/US Housing/Athena MI Archetypes/LCA ",a, ".", b, ".xlsx",sep="")
+fn<-paste("Housing Archetypes/Bill of Materials Report ",a, ".", b, ".xlsx",sep="")
+fn2<-paste("Housing Archetypes/LCA ",a, ".", b, ".xlsx",sep="")
 
 bom<-as.data.frame(read_excel(fn))
 names(bom)<-bom[5,]
@@ -73,9 +75,6 @@ rm(fa)
   }
   assign(paste("mgi",a,sep=""),rbind(get(paste("mgi",a,".1",sep = "")),get(paste("mgi",a,".2",sep = "")),get(paste("mgi",a,".3",sep = "")),get(paste("mgi",a,".4",sep = ""))))
   mgi_arch<-get(paste("mgi",a,sep=""))
-  # assign(paste("mean_mi_",a,sep=""),mean(tapply(mgi_arch$mi,mgi_arch$arch,sum)))
-  # assign(paste("mean_gi20_",a,sep=""),mean(tapply(mgi_arch$gi20,mgi_arch$arch,sum)))
-  # assign(paste("mean_gi60_",a,sep=""),mean(tapply(mgi_arch$gi60,mgi_arch$arch,sum)))
   
   mi_avg<-data.frame(Material=mgio$Material,mi= as.numeric(tapply(mgi_arch$mi,mgi_arch$Material,mean)))
   mi_avg_agg<-data.frame(Material=rownames(mi_agg),mi= as.numeric(t(agg[,2:ncol(agg)])%*%mi_avg$mi))
@@ -91,8 +90,8 @@ rm(fa)
   rm(list=ls(pattern='mi_agg'))
 }
 # calculation for MF hi-rise, for which only one archetype exists ##########
-fn<-paste("~/Yale Courses/Research/US Housing/Athena MI Archetypes/Bill of Materials Report 61_agg.xlsx",sep="")
-fn2<-paste("~/Yale Courses/Research/US Housing/Athena MI Archetypes/LCA 61.xlsx",sep="")
+fn<-paste("Housing Archetypes/Bill of Materials Report 61_agg.xlsx",sep="")
+fn2<-paste("Housing Archetypes/LCA 61.xlsx",sep="")
 bom<-as.data.frame(read_excel(fn))
 names(bom)<-bom[5,]
 bom<-bom[6:nrow(bom),c(1,11)]
@@ -127,9 +126,6 @@ mi_agg<-t(agg[,2:ncol(agg)])%*%mgio$mi
 mi_agg61<-mi_agg
 
 mgi_arch<-mgi61
-# mean_mi_61<-tapply(mgi_arch$mi,mgi_arch$arch,sum)
-# mean_gi20_61<-tapply(mgi_arch$gi20,mgi_arch$arch,sum)
-# mean_gi60_61<-tapply(mgi_arch$gi60,mgi_arch$arch,sum)
 
 mi_avg<-data.frame(Material=mgio$Material,mi= as.numeric(tapply(mgi_arch$mi,mgi_arch$Material,mean)))
 mi_avg_agg<-data.frame(Material=rownames(mi_agg),mi= as.numeric(t(agg[,2:ncol(agg)])%*%mi_avg$mi))
@@ -959,7 +955,7 @@ mgi_full$Type_Found<-paste(mgi_full$Type,mgi_full$Foundation)
 mgi_full[mgi_full$Type_Found=="MF Pile",]$Type_Found<-"MF High-Rise"
 mgi_full[mgi_full$Type_Found=="MF Strip",]$Type_Found<-"MF Low-Rise"
 mgi_full$`Unit Size`<-mgi_full$Size
-
+# Make SI Figure S9
 windows(width=12,height=7)
 # breaking out by size and frame type
 ggplot(mgi_full,aes(x=Type_Found,y=gi20_Tot)) + geom_point(aes(shape=Frame,col=`Unit Size`),size=2.5) + theme_bw() + ylim(0,500) + 
@@ -972,5 +968,3 @@ ggplot(mgi_full,aes(x=Type_Found,y=gi20_Tot)) + geom_point(aes(shape=Frame,col=S
   scale_color_manual(values=c('green4','purple'))+scale_shape_manual(values=c(0, 2, 8)) +
   labs(title = "Embodied GHG Intensities of Archtypes - by Number Stories and Framing Method",y="kgCO2e/m2",x="House and Foundation Type") +
   theme(axis.text=element_text(size=13),axis.title=element_text(size=14,face = "bold"),plot.title = element_text(size = 15, face = "bold"),legend.text=element_text(size=13),legend.title=element_text(size=13))
-
-                                                           

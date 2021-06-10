@@ -1,3 +1,4 @@
+# function to round columns of a data frame to a set number of digits
 round_df <- function(df, digits) {
   nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
   

@@ -1,5 +1,6 @@
 # script to calculate Mat. and GHG intensities per house type and cohort and county, for projections
 # script to load, analyze, and combine by scenario bs.csv files
+# Peter Berrill April 2021
 rm(list=ls()) # clear workspace i.e. remove saved variables
 cat("\014") # clear console
 library(dplyr)
@@ -7,8 +8,8 @@ library(ggplot2)
 library(reshape2)
 library(RColorBrewer)
 setwd("~/Yale Courses/Research/Final Paper/HSM_github")
-load("Resstock_outputs/bs_base.RData")
-load("Resstock_outputs/bs_baseRFA.RData")
+load("Resstock_outputs/bs_base.RData") # too large to store on github
+load("Resstock_outputs/bs_baseRFA.RData") # too large to store on github
 load("Material_Intensities/Arch_intensities.RData") # produced by mgInt.R
 load("Intermediate_results/ctycode.RData")
 StDiv<-unique(bs_base[,c("State","Census.Division")])
@@ -257,8 +258,6 @@ m_tc_SnA<-int('mi','Sand/Aggregate','',bs_base0)
 m_tc_Oth<-int('mi','Other','',bs_base0)
 m_tc_Tot<-int('mi','Tot','',bs_base0)
 
-# save(g20_tc,g30_tc,g40_tc,g50_tc,file="Material_Intensities/gi_base.RData")
-
 # GHG intensities for baseline reudced floor area ########
 bs_baseRFA$arch<-0
 # define all archetype groups
@@ -424,8 +423,6 @@ m_tc_Fbg_RFA<-int('mi','Fibreglass','',bs_baseRFA0)
 m_tc_SnA_RFA<-int('mi','Sand/Aggregate','',bs_baseRFA0)
 m_tc_Oth_RFA<-int('mi','Other','',bs_baseRFA0)
 m_tc_Tot_RFA<-int('mi','Tot','',bs_baseRFA0)
-
-# save(g20_tcRFA,g30_tcRFA,g40_tcRFA,g50_tcRFA,file="Material_Intensities/gi_baseRFA.RData")
 
 # calculate GHG flows #########
 load("HSM_results/County_FloorArea.RData") # loads 5 smop_*_FA files, one for each scenario base, hiDR, hiDRMF, hiMF, RFA
@@ -1589,255 +1586,3 @@ windows(width=7.5, height=4.5)
 ggplot(hs,aes(Year,HHS,col=Scenario)) + geom_line(size=1) + theme_bw()+ ylim(2.55,2.7)+
   labs(title = "National Average Household size, 2020-2060", y = "") +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
-
-
-
-
-
-
-## all old beyond here #############
-# # hiDR
-# for (i in 1:3108) { print(i)
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_SF<-smop_hiDR_FA[[3]][[i]]$NC_SF_m2*g20_tc$SF[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_SF[11:20]<-smop_hiDR_FA[[3]][[i]]$NC_SF_m2[11:20]*g30_tc$SF[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_SF[21:30]<-smop_hiDR_FA[[3]][[i]]$NC_SF_m2[21:30]*g40_tc$SF[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_SF[31:40]<-smop_hiDR_FA[[3]][[i]]$NC_SF_m2[31:40]*g50_tc$SF[i]
-#   
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MF<-smop_hiDR_FA[[3]][[i]]$NC_MF_m2*g20_tc$MF[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MF[11:20]<-smop_hiDR_FA[[3]][[i]]$NC_MF_m2[11:20]*g30_tc$MF[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MF[21:30]<-smop_hiDR_FA[[3]][[i]]$NC_MF_m2[21:30]*g40_tc$MF[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MF[31:40]<-smop_hiDR_FA[[3]][[i]]$NC_MF_m2[31:40]*g50_tc$MF[i]
-#   
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MH<-smop_hiDR_FA[[3]][[i]]$NC_MH_m2*g20_tc$MH[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MH[11:20]<-smop_hiDR_FA[[3]][[i]]$NC_MH_m2[11:20]*g30_tc$MH[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MH[21:30]<-smop_hiDR_FA[[3]][[i]]$NC_MH_m2[21:30]*g40_tc$MH[i]
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC_MH[31:40]<-smop_hiDR_FA[[3]][[i]]$NC_MH_m2[31:40]*g50_tc$MH[i]
-#   
-#   smop_hiDR_FA[[3]][[i]]$GHG_NC<-smop_hiDR_FA[[3]][[i]]$GHG_NC_SF+smop_hiDR_FA[[3]][[i]]$GHG_NC_MF+smop_hiDR_FA[[3]][[i]]$GHG_NC_MH
-# }
-# # extract template for making US summary results, for each scenario ########## # copied from the smvis3 script. Now applied to 3108 counties
-# # extract id, year, pop, pop shares, hhs, occ HU, VR, tot HU, tot dem by type, tot con by type, inflows and outflows to m2 stock, total occupied m2 by type, and construction related GHG
-# us_hiDR_FA<-as.data.frame(smop_hiDR_FA[[3]][[1]][,c(1:31,315:339)])
-# # columns to add from the initial hiDR dataframe
-# add<-c(3,7:9,14:17,22:31,33:48,53:56)
-# add_smop<-c(3,7:9,14:17,22:31,316:331,336:339)
-# # turn all variables except year to 0
-# us_hiDR_FA[,c(1,3:31,33:56)]<-0
-# # nc_hiDR<-rep(0,8) # initialize vector for new construction every 5 years
-# for (i in 1:3108) {
-#   us_hiDR_FA[,add]<-us_hiDR_FA[,add]+smop_hiDR_FA[[3]][[i]][,add_smop]
-# }
-# # calculate shares of population by housing type
-# us_hiDR_FA[,4:6]<-us_hiDR_FA[,7:9]/us_hiDR_FA$Population
-# # calculate HHS
-# us_hiDR_FA[,10:12]<-us_hiDR_FA[,7:9]/us_hiDR_FA[,15:17]
-# us_hiDR_FA$HH_Size<-us_hiDR_FA$Population/us_hiDR_FA$Tot_Hous_Units
-# # calculate vacancy ratios (TU/OU)
-# us_hiDR_FA[,18:21]<-us_hiDR_FA[,22:25]/us_hiDR_FA[,14:17]
-# # calculate m2/cap by type
-# us_hiDR_FA[,c("m2cap_SF","m2cap_MF","m2cap_MH","m2cap")]<-us_hiDR_FA[,c("Occ_m2_SF","Occ_m2_MF","Occ_m2_MH","Occ_m2")]/us_hiDR_FA[,c("Pop_SF","Pop_MF","Pop_MH","Population")]
-# 
-# # hiMF
-# for (i in 1:3108) { print(i)
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_SF<-smop_hiMF_FA[[3]][[i]]$NC_SF_m2*g20_tc$SF[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_SF[11:20]<-smop_hiMF_FA[[3]][[i]]$NC_SF_m2[11:20]*g30_tc$SF[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_SF[21:30]<-smop_hiMF_FA[[3]][[i]]$NC_SF_m2[21:30]*g40_tc$SF[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_SF[31:40]<-smop_hiMF_FA[[3]][[i]]$NC_SF_m2[31:40]*g50_tc$SF[i]
-#   
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MF<-smop_hiMF_FA[[3]][[i]]$NC_MF_m2*g20_tc$MF[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MF[11:20]<-smop_hiMF_FA[[3]][[i]]$NC_MF_m2[11:20]*g30_tc$MF[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MF[21:30]<-smop_hiMF_FA[[3]][[i]]$NC_MF_m2[21:30]*g40_tc$MF[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MF[31:40]<-smop_hiMF_FA[[3]][[i]]$NC_MF_m2[31:40]*g50_tc$MF[i]
-#   
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MH<-smop_hiMF_FA[[3]][[i]]$NC_MH_m2*g20_tc$MH[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MH[11:20]<-smop_hiMF_FA[[3]][[i]]$NC_MH_m2[11:20]*g30_tc$MH[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MH[21:30]<-smop_hiMF_FA[[3]][[i]]$NC_MH_m2[21:30]*g40_tc$MH[i]
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC_MH[31:40]<-smop_hiMF_FA[[3]][[i]]$NC_MH_m2[31:40]*g50_tc$MH[i]
-#   
-#   smop_hiMF_FA[[3]][[i]]$GHG_NC<-smop_hiMF_FA[[3]][[i]]$GHG_NC_SF+smop_hiMF_FA[[3]][[i]]$GHG_NC_MF+smop_hiMF_FA[[3]][[i]]$GHG_NC_MH
-# }
-# # extract template for making US summary results, for each scenario ########## # copied from the smvis3 script. Now applied to 3108 counties
-# # extract id, year, pop, pop shares, hhs, occ HU, VR, tot HU, tot dem by type, tot con by type, inflows and outflows to m2 stock, total occupied m2 by type, and construction related GHG
-# us_hiMF_FA<-as.data.frame(smop_hiMF_FA[[3]][[1]][,c(1:31,315:339)])
-# # columns to add from the initial hiMF dataframe
-# add<-c(3,7:9,14:17,22:31,33:48,53:56)
-# add_smop<-c(3,7:9,14:17,22:31,316:331,336:339)
-# # turn all variables except year to 0
-# us_hiMF_FA[,c(1,3:31,33:56)]<-0
-# # nc_hiMF<-rep(0,8) # initialize vector for new construction every 5 years
-# for (i in 1:3108) {
-#   us_hiMF_FA[,add]<-us_hiMF_FA[,add]+smop_hiMF_FA[[3]][[i]][,add_smop]
-# }
-# # calculate shares of population by housing type
-# us_hiMF_FA[,4:6]<-us_hiMF_FA[,7:9]/us_hiMF_FA$Population
-# # calculate HHS
-# us_hiMF_FA[,10:12]<-us_hiMF_FA[,7:9]/us_hiMF_FA[,15:17]
-# us_hiMF_FA$HH_Size<-us_hiMF_FA$Population/us_hiMF_FA$Tot_Hous_Units
-# # calculate vacancy ratios (TU/OU)
-# us_hiMF_FA[,18:21]<-us_hiMF_FA[,22:25]/us_hiMF_FA[,14:17]
-# # calculate m2/cap by type
-# us_hiMF_FA[,c("m2cap_SF","m2cap_MF","m2cap_MH","m2cap")]<-us_hiMF_FA[,c("Occ_m2_SF","Occ_m2_MF","Occ_m2_MH","Occ_m2")]/us_hiMF_FA[,c("Pop_SF","Pop_MF","Pop_MH","Population")]
-# 
-# # base RFA
-# for (i in 1:3108) { print(i)
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_SF<-smop_RFA_FA[[3]][[i]]$NC_SF_m2*g20_tcRFA$SF[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_SF[11:20]<-smop_RFA_FA[[3]][[i]]$NC_SF_m2[11:20]*g30_tcRFA$SF[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_SF[21:30]<-smop_RFA_FA[[3]][[i]]$NC_SF_m2[21:30]*g40_tcRFA$SF[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_SF[31:40]<-smop_RFA_FA[[3]][[i]]$NC_SF_m2[31:40]*g50_tcRFA$SF[i]
-#   
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MF<-smop_RFA_FA[[3]][[i]]$NC_MF_m2*g20_tcRFA$MF[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MF[11:20]<-smop_RFA_FA[[3]][[i]]$NC_MF_m2[11:20]*g30_tcRFA$MF[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MF[21:30]<-smop_RFA_FA[[3]][[i]]$NC_MF_m2[21:30]*g40_tcRFA$MF[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MF[31:40]<-smop_RFA_FA[[3]][[i]]$NC_MF_m2[31:40]*g50_tcRFA$MF[i]
-#   
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MH<-smop_RFA_FA[[3]][[i]]$NC_MH_m2*g20_tcRFA$MH[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MH[11:20]<-smop_RFA_FA[[3]][[i]]$NC_MH_m2[11:20]*g30_tcRFA$MH[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MH[21:30]<-smop_RFA_FA[[3]][[i]]$NC_MH_m2[21:30]*g40_tcRFA$MH[i]
-#   smop_RFA_FA[[3]][[i]]$GHG_NC_MH[31:40]<-smop_RFA_FA[[3]][[i]]$NC_MH_m2[31:40]*g50_tcRFA$MH[i]
-#   
-#   smop_RFA_FA[[3]][[i]]$GHG_NC<-smop_RFA_FA[[3]][[i]]$GHG_NC_SF+smop_RFA_FA[[3]][[i]]$GHG_NC_MF+smop_RFA_FA[[3]][[i]]$GHG_NC_MH
-# }
-# # extract template for making US summary results, for each scenario ########## # copied from the smvis3 script. Now applied to 3108 counties
-# # extract id, year, pop, pop shares, hhs, occ HU, VR, tot HU, tot dem by type, tot con by type, inflows and outflows to m2 stock, total occupied m2 by type, and construction related GHG
-# us_RFA_FA<-as.data.frame(smop_RFA_FA[[3]][[1]][,c(1:31,315:339)])
-# # columns to add from the initial RFA dataframe
-# add<-c(3,7:9,14:17,22:31,33:48,53:56)
-# add_smop<-c(3,7:9,14:17,22:31,316:331,336:339)
-# # turn all variables except year to 0
-# us_RFA_FA[,c(1,3:31,33:56)]<-0
-# # nc_RFA<-rep(0,8) # initialize vector for new construction every 5 years
-# for (i in 1:3108) {
-#   us_RFA_FA[,add]<-us_RFA_FA[,add]+smop_RFA_FA[[3]][[i]][,add_smop]
-# }
-# # calculate shares of population by housing type
-# us_RFA_FA[,4:6]<-us_RFA_FA[,7:9]/us_RFA_FA$Population
-# # calculate HHS
-# us_RFA_FA[,10:12]<-us_RFA_FA[,7:9]/us_RFA_FA[,15:17]
-# us_RFA_FA$HH_Size<-us_RFA_FA$Population/us_RFA_FA$Tot_Hous_Units
-# # calculate vacancy ratios (TU/OU)
-# us_RFA_FA[,18:21]<-us_RFA_FA[,22:25]/us_RFA_FA[,14:17]
-# # calculate m2/cap by type
-# us_RFA_FA[,c("m2cap_SF","m2cap_MF","m2cap_MH","m2cap")]<-us_RFA_FA[,c("Occ_m2_SF","Occ_m2_MF","Occ_m2_MH","Occ_m2")]/us_RFA_FA[,c("Pop_SF","Pop_MF","Pop_MH","Population")]
-# 
-# # hiDR RFA
-# for (i in 1:3108) { print(i)
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_SF<-smop_hiDR_RFA_FA[[3]][[i]]$NC_SF_m2*g20_tcRFA$SF[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_SF[11:20]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_SF_m2[11:20]*g30_tcRFA$SF[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_SF[21:30]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_SF_m2[21:30]*g40_tcRFA$SF[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_SF[31:40]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_SF_m2[31:40]*g50_tcRFA$SF[i]
-#   
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MF<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MF_m2*g20_tcRFA$MF[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MF[11:20]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MF_m2[11:20]*g30_tcRFA$MF[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MF[21:30]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MF_m2[21:30]*g40_tcRFA$MF[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MF[31:40]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MF_m2[31:40]*g50_tcRFA$MF[i]
-#   
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MH<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MH_m2*g20_tcRFA$MH[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MH[11:20]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MH_m2[11:20]*g30_tcRFA$MH[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MH[21:30]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MH_m2[21:30]*g40_tcRFA$MH[i]
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MH[31:40]<-smop_hiDR_RFA_FA[[3]][[i]]$NC_MH_m2[31:40]*g50_tcRFA$MH[i]
-#   
-#   smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC<-smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_SF+smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MF+smop_hiDR_RFA_FA[[3]][[i]]$GHG_NC_MH
-# }
-# # extract template for making US summary results, for each scenario ########## # copied from the smvis3 script. Now applied to 3108 counties
-# # extract id, year, pop, pop shares, hhs, occ HU, VR, tot HU, tot dem by type, tot con by type, inflows and outflows to m2 stock, total occupied m2 by type, and construction related GHG
-# us_hiDR_RFA_FA<-as.data.frame(smop_hiDR_RFA_FA[[3]][[1]][,c(1:31,315:339)])
-# # columns to add from the initial RFA dataframe
-# add<-c(3,7:9,14:17,22:31,33:48,53:56)
-# add_smop<-c(3,7:9,14:17,22:31,316:331,336:339)
-# # turn all variables except year to 0
-# us_hiDR_RFA_FA[,c(1,3:31,33:56)]<-0
-# # nc_hiDR_RFA<-rep(0,8) # initialize vector for new construction every 5 years
-# for (i in 1:3108) {
-#   us_hiDR_RFA_FA[,add]<-us_hiDR_RFA_FA[,add]+smop_hiDR_RFA_FA[[3]][[i]][,add_smop]
-# }
-# # calculate shares of population by housing type
-# us_hiDR_RFA_FA[,4:6]<-us_hiDR_RFA_FA[,7:9]/us_hiDR_RFA_FA$Population
-# # calculate HHS
-# us_hiDR_RFA_FA[,10:12]<-us_hiDR_RFA_FA[,7:9]/us_hiDR_RFA_FA[,15:17]
-# us_hiDR_RFA_FA$HH_Size<-us_hiDR_RFA_FA$Population/us_hiDR_RFA_FA$Tot_Hous_Units
-# # calculate vacancy ratios (TU/OU)
-# us_hiDR_RFA_FA[,18:21]<-us_hiDR_RFA_FA[,22:25]/us_hiDR_RFA_FA[,14:17]
-# # calculate m2/cap by type
-# us_hiDR_RFA_FA[,c("m2cap_SF","m2cap_MF","m2cap_MH","m2cap")]<-us_hiDR_RFA_FA[,c("Occ_m2_SF","Occ_m2_MF","Occ_m2_MH","Occ_m2")]/us_hiDR_RFA_FA[,c("Pop_SF","Pop_MF","Pop_MH","Population")]
-# 
-# # hiMF RFA
-# smop_hiMF_RFA_FA<-smop_hiMF_RFA # IF necessary
-# for (i in 1:3108) { print(i)
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_SF<-smop_hiMF_RFA_FA[[3]][[i]]$NC_SF_m2*g20_tcRFA$SF[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_SF[11:20]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_SF_m2[11:20]*g30_tcRFA$SF[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_SF[21:30]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_SF_m2[21:30]*g40_tcRFA$SF[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_SF[31:40]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_SF_m2[31:40]*g50_tcRFA$SF[i]
-#   
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MF<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MF_m2*g20_tcRFA$MF[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MF[11:20]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MF_m2[11:20]*g30_tcRFA$MF[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MF[21:30]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MF_m2[21:30]*g40_tcRFA$MF[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MF[31:40]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MF_m2[31:40]*g50_tcRFA$MF[i]
-#   
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MH<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MH_m2*g20_tcRFA$MH[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MH[11:20]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MH_m2[11:20]*g30_tcRFA$MH[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MH[21:30]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MH_m2[21:30]*g40_tcRFA$MH[i]
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MH[31:40]<-smop_hiMF_RFA_FA[[3]][[i]]$NC_MH_m2[31:40]*g50_tcRFA$MH[i]
-#   
-#   smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC<-smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_SF+smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MF+smop_hiMF_RFA_FA[[3]][[i]]$GHG_NC_MH
-# }
-# # extract template for making US summary results, for each scenario ########## # copied from the smvis3 script. Now applied to 3108 counties
-# # extract id, year, pop, pop shares, hhs, occ HU, VR, tot HU, tot dem by type, tot con by type, inflows and outflows to m2 stock, total occupied m2 by type, and construction related GHG
-# us_hiMF_RFA_FA<-as.data.frame(smop_hiMF_RFA_FA[[3]][[1]][,c(1:31,315:339)])
-# # columns to add from the initial RFA dataframe
-# add<-c(3,7:9,14:17,22:31,33:48,53:56)
-# add_smop<-c(3,7:9,14:17,22:31,316:331,336:339)
-# # turn all variables except year to 0
-# us_hiMF_RFA_FA[,c(1,3:31,33:56)]<-0
-# # nc_hiMF_RFA<-rep(0,8) # initialize vector for new construction every 5 years
-# for (i in 1:3108) {
-#   us_hiMF_RFA_FA[,add]<-us_hiMF_RFA_FA[,add]+smop_hiMF_RFA_FA[[3]][[i]][,add_smop]
-# }
-# # calculate shares of population by housing type
-# us_hiMF_RFA_FA[,4:6]<-us_hiMF_RFA_FA[,7:9]/us_hiMF_RFA_FA$Population
-# # calculate HHS
-# us_hiMF_RFA_FA[,10:12]<-us_hiMF_RFA_FA[,7:9]/us_hiMF_RFA_FA[,15:17]
-# us_hiMF_RFA_FA$HH_Size<-us_hiMF_RFA_FA$Population/us_hiMF_RFA_FA$Tot_Hous_Units
-# # calculate vacancy ratios (TU/OU)
-# us_hiMF_RFA_FA[,18:21]<-us_hiMF_RFA_FA[,22:25]/us_hiMF_RFA_FA[,14:17]
-# # calculate m2/cap by type
-# us_hiMF_RFA_FA[,c("m2cap_SF","m2cap_MF","m2cap_MH","m2cap")]<-us_hiMF_RFA_FA[,c("Occ_m2_SF","Occ_m2_MF","Occ_m2_MH","Occ_m2")]/us_hiMF_RFA_FA[,c("Pop_SF","Pop_MF","Pop_MH","Population")]
-# 
-# save(us_base_FA,us_hiDR_FA,us_hiMF_FA,us_RFA_FA,us_hiDR_RFA_FA,us_hiMF_RFA_FA,file="HSM_results/US_FA_GHG_summaries.RData")
-# 
-# # comparison of total embodied GHG emissions in the 6 different scenarios
-# sum(us_base_FA$GHG_NC)*1e-9 # 4,443 Mt
-# sum(us_hiDR_FA$GHG_NC)*1e-9 # 5,519 Mt
-# sum(us_hiMF_FA$GHG_NC)*1e-9 # 3,898 Mt
-# sum(us_RFA_FA$GHG_NC)*1e-9 # 3,575 Mt
-# sum(us_hiDR_RFA_FA$GHG_NC)*1e-9 # 4,455 Mt
-# sum(us_hiMF_RFA_FA$GHG_NC)*1e-9 # 3,247 Mt
-# 
-# # plot some results ######
-# m2c_base<-as.data.frame(cbind(us_base_FA$Year,us_base_FA$HS_Scenario,us_base_FA$m2cap))
-# m2c_hiDR<-as.data.frame(cbind(us_hiDR_FA$Year,us_hiDR_FA$HS_Scenario,us_hiDR_FA$m2cap))
-# m2c_hiMF<-as.data.frame(cbind(us_hiMF_FA$Year,us_hiMF_FA$HS_Scenario,us_hiMF_FA$m2cap))
-# 
-# m2c_RFA<-as.data.frame(cbind(us_RFA_FA$Year,us_RFA_FA$HS_Scenario,us_RFA_FA$m2cap))
-# m2c_hiDR_RFA<-as.data.frame(cbind(us_hiDR_RFA_FA$Year,us_hiDR_RFA_FA$HS_Scenario,us_hiDR_RFA_FA$m2cap))
-# m2c_hiMF_RFA<-as.data.frame(cbind(us_hiMF_RFA_FA$Year,us_hiMF_RFA_FA$HS_Scenario,us_hiMF_RFA_FA$m2cap))
-# 
-# m2<-rbind(m2c_base,m2c_hiDR,m2c_hiMF,m2c_RFA,m2c_hiDR_RFA,m2c_hiMF_RFA) # the six housing stock scenarios for the total energy and embodied GHG paper
-# names(m2)<-c("Year","HS_Scenario","m2/cap")
-# m2[m2$HS_Scenario==1,]$HS_Scenario<-"1. Baseline"
-# m2[m2$HS_Scenario==2,]$HS_Scenario<-"2. High Turnover"
-# m2[m2$HS_Scenario==3,]$HS_Scenario<-"3. High Multifamily"
-# m2$FA_Scenario<-"A"
-# m2$FA_Scenario[124:246]<-"B"
-# m2$Scenario<-"O"
-# m2[m2$HS_Scenario=="1. Baseline" & m2$FA_Scenario=="A",]$Scenario<-"1A. Baseline"
-# m2[m2$HS_Scenario=="2. High Turnover" & m2$FA_Scenario=="A",]$Scenario<-"2A. High Turnover"
-# m2[m2$HS_Scenario=="3. High Multifamily" & m2$FA_Scenario=="A",]$Scenario<-"3A. High Multifamily"
-# m2[m2$HS_Scenario=="1. Baseline" & m2$FA_Scenario=="B",]$Scenario<-"1B. Baseline RFA"
-# m2[m2$HS_Scenario=="2. High Turnover" & m2$FA_Scenario=="B",]$Scenario<-"2B. High Turnover RFA"
-# m2[m2$HS_Scenario=="3. High Multifamily" & m2$FA_Scenario=="B",]$Scenario<-"3B. High Multifamily RFA"
-# 
-# 
-# windows(width = 7.5,height = 6)
-# ggplot(m2,aes(Year,`m2/cap`,group=Scenario)) + geom_line(aes(color=Scenario),size=1)+ ylim(50,73) +
-#   labs(title ="Floor area per capita by housing stock scenario, 2020-2060") + theme_bw() + scale_color_brewer(palette="Paired") +
-#   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))

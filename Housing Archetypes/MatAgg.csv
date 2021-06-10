@@ -1,0 +1,33 @@
+Material,Cement,Concrete,Steel,Glass,Gypsum,Insulation,Wood,Fibreglass,Sand/Aggregate,Other,Transport&Construction
+Asphalt-saturated Felt,0,0,0,0,0,0,0,0,0,1,0
+Gypsum Board,0,0,0,0,1,0,0,0,0,0,0
+General Polyethylene,0,0,0,0,0,0,0,0,0,1,0
+Aluminium,0,0,0,0,0,0,0,0,0,1,0
+Cement,1,0,0,0,0,0,0,0,0,0,0
+Concrete,0,1,0,0,0,0,0,0,0,0,0
+Glass,0,0,0,1,0,0,0,0,0,0,0
+Expanded Polystyrene,0,0,0,0,0,1,0,0,0,0,0
+Extruded Polystyrene,0,0,0,0,0,1,0,0,0,0,0
+Fiberglass Insulation,0,0,0,0,0,1,0,0,0,0,0
+Glass fibre reinforced plastic,0,0,0,0,0,0,0,1,0,0,0
+Steel,0,0,1,0,0,0,0,0,0,0,0
+Fibrelass Shingles,0,0,0,0,0,0,0,1,0,0,0
+Gypsum Joint Compound,0,0,0,0,1,0,0,0,0,0,0
+Laminated Veneer Lumber,0,0,0,0,0,0,1,0,0,0,0
+Lime,0,0,0,0,0,0,0,0,0,1,0
+Oriented Strand Board,0,0,0,0,0,0,1,0,0,0,0
+Timber,0,0,0,0,0,0,1,0,0,0,0
+Paper,0,0,0,0,0,0,1,0,0,0,0
+Plywood,0,0,0,0,0,0,1,0,0,0,0
+"Paint, solvent-based",0,0,0,0,0,0,0,0,0,1,0
+"Paint, water-based",0,0,0,0,0,0,0,0,0,1,0
+Poly-iso insulation foam board,0,0,0,0,0,1,0,0,0,0,0
+PVC,0,0,0,0,0,0,0,0,0,1,0
+Sand/Aggregate,0,0,0,0,0,0,0,0,1,0,0
+Brick,0,0,0,0,0,0,0,0,0,1,0
+TPO,0,0,0,0,0,0,0,0,0,1,0
+EPDM,0,0,0,0,0,0,0,0,0,1,0
+Asphalt  ,0,0,0,0,0,0,0,0,0,1,0
+Void,0,0,0,0,0,0,0,0,0,1,0
+Transport (A4),0,0,0,0,0,0,0,0,0,0,1
+Construction (A5),0,0,0,0,0,0,0,0,0,0,1

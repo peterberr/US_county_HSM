@@ -1,5 +1,5 @@
 # mapping spatial results by counties, states, etc.
-# Jan 23 2021
+# Peter Berrill May 2021
 
 # script to load, analyze, and combine by scenario bs.csv files
 rm(list=ls()) # clear workspace i.e. remove saved variables
@@ -16,11 +16,10 @@ library(ggrepel)
 
 set_urbn_defaults(style = "map")
 
-# load("HSM_results/County_FloorArea.RData")
 load("HSM_results/County_FloorArea_Mat.RData")
 #material flows
 MatFl<-smop_base_FA[,1:2]
-# MatFl[,c("Dem_SF_m2","Dem_MF_m2", "Dem_MH_m2", "NC_SF_m2", "NC_MF_m2", "NC_MH_m2")]<-0
+
 MatFl[,c("M_Rat_Con20","M_Rat_Stl20","M_Rat_Tot20",
          "M_Rat_Con30","M_Rat_Stl30","M_Rat_Tot30",
          "M_Rat_Con40","M_Rat_Stl40","M_Rat_Tot40",
@@ -48,10 +47,7 @@ MatFl[is.infinite(MatFl$M_Rat_Tot40),]$M_Rat_Tot40<-5
 MatFl[is.infinite(MatFl$M_Rat_Tot50),]$M_Rat_Tot50<-5
 
 
-# MatFl$lnCon20<-log(MatFl$M_Rat_Con20)
-# MatFl[is.infinite(MatFl$lnCon20),]$lnCon20<--2
-# MatFl[MatFl$lnCon20>5 ,]$lnCon20<-5
-# MatFl[MatFl$lnCon20< -5 ,]$lnCon20<--5
+# Top-code material flow ratio to 6 to ensure better visualization of detial between counties
 MatFl[MatFl$M_Rat_Con20>6,]$M_Rat_Con20<-6
 MatFl[MatFl$M_Rat_Con30>6,]$M_Rat_Con30<-6
 MatFl[MatFl$M_Rat_Con40>6,]$M_Rat_Con40<-6
