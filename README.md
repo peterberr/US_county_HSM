@@ -1,6 +1,6 @@
 # US_county_HSM
 
-README last updated June 10 2021
+README last updated August 9 2021
 
 A housing stock model for US counties
 
@@ -8,7 +8,7 @@ This repository contains data and scripts used to develop a housing stock projec
 The results of this model include material outflows from residential demolition and material requirements for residential construction at a county level; GHG emissions from new construction; 
 and evolution of per capita floor area consumption at county and national resolution.
 
-The details and results of this model will be published open-source in 'Buildings and Cities' (awaiting doi). The accepted manuscript, supporting information, and poster presentation of the main results can be found in the 'Publication Files' folder.
+The details and results of this model is published open-source in 'Buildings and Cities' (https:// doi.org/10.5334/bc.126). The accepted manuscript, supporting information, and poster presentation of the main results can be found in the 'Publication Files' folder.
 A video presentation of the results can be found at https://youtu.be/EIb2h1OSUn8
 
 Data inputs and outputs of interest: 
