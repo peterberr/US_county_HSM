@@ -258,6 +258,21 @@ m_tc_SnA<-int('mi','Sand/Aggregate','',bs_base0)
 m_tc_Oth<-int('mi','Other','',bs_base0)
 m_tc_Tot<-int('mi','Tot','',bs_base0)
 
+# combine and save the material intensities for each material by county
+m_tc_all<-m_tc_Cem[,c(5,1)]
+m_tc_all[,paste(c('MF','MH','SF'),'Cement',sep = '_')]<-m_tc_Cem[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Concrete',sep = '_')]<-m_tc_Con[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Steel',sep = '_')]<-m_tc_Stl[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Glass',sep = '_')]<-m_tc_Gls[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Wood',sep = '_')]<-m_tc_Wod[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Gypsum',sep = '_')]<-m_tc_Gyp[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Insulation',sep = '_')]<-m_tc_Ins[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Fibreglass',sep = '_')]<-m_tc_Fbg[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Sand_Aggregate',sep = '_')]<-m_tc_SnA[,c(2:4)]
+m_tc_all[,paste(c('MF','MH','SF'),'Other',sep = '_')]<-m_tc_Oth[,c(2:4)]
+
+save(m_tc_all,file='Material_Intensities/MI_tc.RData')
+
 # GHG intensities for baseline reudced floor area ########
 bs_baseRFA$arch<-0
 # define all archetype groups
@@ -1285,10 +1300,15 @@ m2c_hiMF<-as.data.frame(cbind(us_hiMF_FA$Year,us_hiMF_FA$HS_Scenario,us_hiMF_FA$
 m2c_hiDRMF<-as.data.frame(cbind(us_hiDRMF_FA$Year,us_hiDRMF_FA$HS_Scenario,us_hiDRMF_FA$m2cap))
 m2c_RFA<-as.data.frame(cbind(us_RFA_FA$Year,us_RFA_FA$HS_Scenario,us_RFA_FA$m2cap))
 m2c_hiMF_RFA<-as.data.frame(cbind(us_hiMF_RFA_FA$Year,us_hiMF_RFA_FA$HS_Scenario,us_hiMF_RFA_FA$m2cap))
+m2c_hiDR_RFA<-as.data.frame(cbind(us_hiDR_RFA_FA$Year,us_hiDR_RFA_FA$HS_Scenario,us_hiDR_RFA_FA$m2cap))
 m2c_RFA[,2]<-5
 m2c_hiMF_RFA[,2]<-6
+m2c_hiDR_RFA[,2]<-4
 
-m2<-rbind(m2c_base,m2c_hiDR,m2c_hiMF,m2c_hiDRMF,m2c_RFA,m2c_hiMF_RFA) # the five scenarios for the HSM paper, now doing six
+m2<-rbind(m2c_base,m2c_hiDR,m2c_hiMF,m2c_hiDRMF,m2c_RFA,m2c_hiMF_RFA) # the six scenarios for the HSM paper
+
+m2_new<-rbind(m2c_base,m2c_hiDR,m2c_hiMF,m2c_RFA,m2c_hiMF_RFA,m2c_hiDR_RFA) # the six scenarios for the energy+embodied paper
+
 names(m2)<-c("Year","Scenario","m2/cap")
 m2[m2$Scenario==1,]$Scenario<-"1. Baseline"
 m2[m2$Scenario==2,]$Scenario<-"2. High Turnover"
@@ -1297,10 +1317,29 @@ m2[m2$Scenario==4,]$Scenario<-"4. High TO & MF"
 m2[m2$Scenario==5,]$Scenario<-"5. Red. Floor Area"
 m2[m2$Scenario==6,]$Scenario<-"6. Hi MF, Red. Floor Area"
 
+names(m2_new)<-c("Year","Scenario","m2/cap")
+m2_new[m2_new$Scenario==1,]$Scenario<-"1A/C. Baseline"
+m2_new[m2_new$Scenario==2,]$Scenario<-"2A/C. High Turnover"
+m2_new[m2_new$Scenario==3,]$Scenario<-"3A/C. High Multifamily"
+m2_new[m2_new$Scenario==4,]$Scenario<-"2B/D. High Turnover RFA"
+m2_new[m2_new$Scenario==5,]$Scenario<-"1B/D. Baseline RFA"
+m2_new[m2_new$Scenario==6,]$Scenario<-"3B/D. High Multifamily RFA"
+
+# save ED Fig 7 data
+write.csv(m2_new,file='~/projects/Yale/resstock_projections/Figure_Results_Data/ED_Fig7.csv',row.names = FALSE)
+
 cols<-brewer.pal(n = 7, name = "Set1")[c(1:5,7)]
 windows(width = 7.8,height = 6)
 ggplot(m2,aes(Year,`m2/cap`,group=Scenario)) + geom_line(aes(color=Scenario),size=1)+ ylim(50,73) +
   labs(title ="Floor area per capita by housing stock scenario, 2020-2060") + theme_bw() + scale_color_manual(values = cols)  +  #scale_color_brewer(palette="Set1") +
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
+
+
+cols<-rev(brewer.pal(n = 10, name = "Paired")[c(1,2,3,4,7,8)])
+cols[c(2,4,6)]<-c('#e6a655','#95c46c','#7db9c9')
+windows(width = 7.8,height = 5.5)
+ggplot(m2_new,aes(Year,`m2/cap`,group=Scenario)) + geom_line(aes(color=Scenario),size=1)+ ylim(50,73) +
+  labs(title ="Floor area per capita by housing stock scenario, 2020-2060") + theme_bw() +  scale_color_manual(values = cols)  +  # scale_color_brewer(palette="Paired") +
   theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 12, face = "bold"))
 
 

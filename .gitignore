@@ -7,3 +7,4 @@ Resstock_outputs/*
 # Rhistory files
 /*.Rhistory
 .Rhistory
+.Rproj.user

@@ -187,17 +187,18 @@ mFA_all<-rbind(mFA,mFA_RFA)
 mFA_all$Type_Scen<-paste(mFA_all$Type,mFA_all$Scenario,sep="_")
 mFA_all$Characteristics<-"Base"
 mFA_all[mFA_all$Scenario=="5. Red. FA",]$Characteristics<-"Reduced FA"
-windows()
-ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Characteristics),size=1)+geom_point(aes(color=Type),size=2) + 
-  labs(title = "Mean floor area of house types by cohort", y = "Mean Floor Area (m2)") + theme_bw() + ylim(c(10,260)) +
-  theme(axis.text=element_text(size=12),axis.title=element_text(size=14,face = "bold"),plot.title = element_text(size = 15, face = "bold"), 
-        legend.title=element_text(size=12), legend.text=element_text(size=11))
+windows(width = 7.5,height = 5.3)
+ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Characteristics),size=1)+geom_point(aes(color=Type),size=2) + scale_y_continuous(breaks = seq(0,250,50), limits = c(10,260),minor_breaks = NULL) +
+  labs(title = "Mean floor area of house types by cohort", y = "Mean Floor Area (m2)") + theme_bw() + #ylim(c(10,260)) +
+  theme(axis.text=element_text(size=10),axis.title=element_text(size=11,face = "bold"),plot.title = element_text(size = 13, face = "bold"), 
+        legend.title=element_text(size=11), legend.text=element_text(size=10))
 mFA_all[mFA_all$Scenario=="5. Red. FA",]$Scenario<-"5-6"
 windows()
 ggplot(mFA_all,aes(x=Cohort,y=FloorArea,group=Type_Scen))+geom_line(aes(color=Type,linetype=Scenario),size=1)+geom_point(aes(color=Type),size=2) + 
   labs(title = "Mean floor area of house types by cohort", y = "Mean Floor Area (m2)") + theme_bw() + ylim(c(10,260)) +
-  theme(axis.text=element_text(size=12),axis.title=element_text(size=14,face = "bold"),plot.title = element_text(size = 15, face = "bold"), 
-        legend.title=element_text(size=12), legend.text=element_text(size=11))
+  theme(axis.text=element_text(size=11),axis.title=element_text(size=12,face = "bold"),plot.title = element_text(size = 13, face = "bold"), 
+        legend.title=element_text(size=11), legend.text=element_text(size=10))
+write.csv(mFA_all[,c('Cohort','Type','Characteristics','FloorArea')],file = '~/projects/Yale/resstock_projections/Figure_Results_Data/ED_Fig1.csv',row.names = FALSE)
 # mFA by geograpy, base #####
 # mean floor area by type, cohort, and region
 meanFA_tcr<-round(as.data.frame(tapply(bs2020$Floor.Area.m2, list(bs2020$Census.Region,bs2020$Type3,bs2020$Vintage.ACS), mean)),2)
